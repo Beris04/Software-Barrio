@@ -63,23 +63,6 @@ summary{padding:13px 14px;cursor:pointer;font-weight:950;background:#fff7f4;disp
   <button class="tab" onclick="showView('entregas')">✅ Entregas</button>
   <button class="tab" onclick="showView('historial')">📋 Historial</button>
 </nav>
-
-<div id="cashierLoginModal" class="modal show">
-  <div class="modal-box" style="max-width:420px;">
-    <div class="modal-head">
-      <div>
-        <h2 style="margin:0;">Acceso Caja</h2>
-        <p class="muted" style="margin:3px 0 0;">Usuario y contraseña requeridos.</p>
-      </div>
-    </div>
-    <label>Usuario</label>
-    <input id="cashierUser" placeholder="Usuario"/>
-    <label>Contraseña</label>
-    <input id="cashierPass" type="password" placeholder="Contraseña"/>
-    <button class="btn full green" onclick="loginCashier()">Entrar a Caja</button>
-  </div>
-</div>
-
 <main>
 <section id="view-helados" class="grid two">
   <div class="card order-form-card">
@@ -99,9 +82,9 @@ summary{padding:13px 14px;cursor:pointer;font-weight:950;background:#fff7f4;disp
   </div>
 </section>
 
-<section id="view-caja" class="card" style="display:none;"><h2>Caja | Pendientes de pago</h2><label>Buscar cliente</label><input id="cashierSearch" oninput="renderCashier()" placeholder="Buscar..."/><div id="cashierOrders" class="orders-grid-2" style="margin-top:12px;"></div></section>
-<section id="view-entregas" class="card" style="display:none;"><div id="paidAlert" class="alert">🔔 Nuevo pago confirmado. Helados puede entregar.</div><h2>Helados | Pagados por entregar</h2><div id="deliveryOrders" class="orders-grid-2"></div></section>
-<section id="view-historial" class="card" style="display:none;"><h2>Historial</h2><div class="toolbar"><button class="btn gray" onclick="exportHistory()">Exportar CSV</button></div><div id="history" class="orders-grid-3" style="margin-top:12px;"></div></section>
+<section id="view-caja" class="card" style="display:none;"><h2>Caja | Pendientes de pago</h2><label>Buscar cliente</label><input id="cashierSearch" oninput="renderCashier()" placeholder="Buscar..."/><div id="cashierOrders" style="margin-top:12px;"></div></section>
+<section id="view-entregas" class="card" style="display:none;"><div id="paidAlert" class="alert">🔔 Nuevo pago confirmado. Helados puede entregar.</div><h2>Helados | Pagados por entregar</h2><div id="deliveryOrders"></div></section>
+<section id="view-historial" class="card" style="display:none;"><h2>Historial</h2><div class="toolbar"><button class="btn gray" onclick="exportHistory()">Exportar CSV</button></div><div id="history" style="margin-top:12px;"></div></section>
 </main>
 <div id="barcodeModal" class="modal"><div class="modal-box"><div class="modal-head"><div><h2 id="barcodeTitle" style="margin:0;">Códigos</h2><p class="muted" style="margin:3px 0 0;">Códigos para escanear en caja.</p></div><button class="btn red" onclick="closeBarcodes()">Cerrar</button></div><div id="barcodeContent"></div></div></div>
 
@@ -115,20 +98,6 @@ let allOrders = [];
 let current = {scoops:1, flavorId:"matcha", toppings:[]};
 let openGroups = {"Gomitas":true,"Pocky":false,"Galletas":false,"KitKat":false,"Orion":false};
 let currentView = "helados";
-
-let cashierUnlocked = false;
-function loginCashier(){
-  const u=document.getElementById('cashierUser').value.trim();
-  const p=document.getElementById('cashierPass').value.trim();
-  if(u==='Caja' && p==='GoHobi2026'){
-    cashierUnlocked=true;
-    document.getElementById('cashierLoginModal').classList.remove('show');
-    alert('Acceso correcto.');
-  }else{
-    alert('Usuario o contraseña incorrectos.');
-  }
-}
-
 
 function money(n){return Number(n||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});}
 function now(){return new Date().toLocaleString('es-MX');}
@@ -147,10 +116,6 @@ supabaseClient.channel('cero_grados_orders_changes')
   .subscribe();
 
 function showView(view){
-  if(view==='caja' && !cashierUnlocked){
-    document.getElementById('cashierLoginModal').classList.add('show');
-    return;
-  }
   currentView=view;
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   const map={helados:0,caja:1,entregas:2,historial:3};
