@@ -63,6 +63,23 @@ summary{padding:13px 14px;cursor:pointer;font-weight:950;background:#fff7f4;disp
   <button class="tab" onclick="showView('entregas')">✅ Entregas</button>
   <button class="tab" onclick="showView('historial')">📋 Historial</button>
 </nav>
+
+<div id="cashierLoginModal" class="modal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head">
+      <div>
+        <h2 style="margin:0;">Acceso Caja</h2>
+        <p class="muted" style="margin:3px 0 0;">Usuario y contraseña requeridos.</p>
+      </div>
+    </div>
+    <label>Usuario</label>
+    <input id="cashierUser" placeholder="Usuario"/>
+    <label>Contraseña</label>
+    <input id="cashierPass" type="password" placeholder="Contraseña"/>
+    <button class="btn full green" onclick="loginCashier()">Entrar a Caja</button>
+  </div>
+</div>
+
 <main>
 <section id="view-helados" class="grid two">
   <div class="card order-form-card">
@@ -82,9 +99,9 @@ summary{padding:13px 14px;cursor:pointer;font-weight:950;background:#fff7f4;disp
   </div>
 </section>
 
-<section id="view-caja" class="card" style="display:none;"><h2>Caja | Pendientes de pago</h2><label>Buscar cliente</label><input id="cashierSearch" oninput="renderCashier()" placeholder="Buscar..."/><div id="cashierOrders" style="margin-top:12px;"></div></section>
-<section id="view-entregas" class="card" style="display:none;"><div id="paidAlert" class="alert">🔔 Nuevo pago confirmado. Helados puede entregar.</div><h2>Helados | Pagados por entregar</h2><div id="deliveryOrders"></div></section>
-<section id="view-historial" class="card" style="display:none;"><h2>Historial</h2><div class="toolbar"><button class="btn gray" onclick="exportHistory()">Exportar CSV</button></div><div id="history" style="margin-top:12px;"></div></section>
+<section id="view-caja" class="card" style="display:none;"><h2>Caja | Pendientes de pago</h2><p class="muted">Si el pedido no aparece, presiona actualizar. Si Supabase no conecta, saldrá un error arriba.</p><div class="toolbar"><button class="btn blue" onclick="loadOrders()">Actualizar pedidos</button></div><label>Buscar cliente</label><input id="cashierSearch" oninput="renderCashier()" placeholder="Buscar..."/><div id="cashierOrders" class="orders-grid-2" style="margin-top:12px;"></div></section>
+<section id="view-entregas" class="card" style="display:none;"><div id="paidAlert" class="alert">🔔 Nuevo pago confirmado. Helados puede entregar.</div><h2>Helados | Pagados por entregar</h2><div id="deliveryOrders" class="orders-grid-2"></div></section>
+<section id="view-historial" class="card" style="display:none;"><h2>Historial</h2><div class="toolbar"><button class="btn gray" onclick="exportHistory()">Exportar CSV</button></div><div id="history" class="orders-grid-3" style="margin-top:12px;"></div></section>
 </main>
 <div id="barcodeModal" class="modal"><div class="modal-box"><div class="modal-head"><div><h2 id="barcodeTitle" style="margin:0;">Códigos</h2><p class="muted" style="margin:3px 0 0;">Códigos para escanear en caja.</p></div><button class="btn red" onclick="closeBarcodes()">Cerrar</button></div><div id="barcodeContent"></div></div></div>
 
@@ -99,23 +116,57 @@ let current = {scoops:1, flavorId:"matcha", toppings:[]};
 let openGroups = {"Gomitas":true,"Pocky":false,"Galletas":false,"KitKat":false,"Orion":false};
 let currentView = "helados";
 
+let cashierUnlocked = false;
+function loginCashier(){
+  const u=document.getElementById('cashierUser').value.trim();
+  const p=document.getElementById('cashierPass').value.trim();
+  if(u==='Caja' && p==='GoHobi2026'){
+    cashierUnlocked=true;
+    document.getElementById('cashierLoginModal').classList.remove('show');
+    alert('Acceso correcto.');
+  }else{
+    alert('Usuario o contraseña incorrectos.');
+  }
+}
+
+
 function money(n){return Number(n||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});}
 function now(){return new Date().toLocaleString('es-MX');}
 function setStatus(t){document.getElementById('syncStatus').textContent=t;}
 
 async function loadOrders(){
-  const { data, error } = await supabaseClient.from('cero_grados_orders').select('*').order('created_at', {ascending:false});
-  if(error){setStatus('Modo local / revisar Supabase'); allOrders = JSON.parse(localStorage.getItem('cero_orders_local')||'[]');}
-  else{setStatus('Conectado a Supabase'); allOrders = data || [];}
+  const { data, error } = await supabaseClient
+    .from('cero_grados_orders')
+    .select('*')
+    .order('created_at', {ascending:false});
+
+  if(error){
+    console.error('Error Supabase SELECT:', error);
+    setStatus('ERROR Supabase: ' + (error.message || 'revisar tabla/RLS'));
+    allOrders = [];
+    alert('No se pudo conectar a Supabase. Revisa que ejecutaste supabase_schema.sql y que la tabla cero_grados_orders existe. Error: ' + (error.message || JSON.stringify(error)));
+  } else {
+    setStatus('Conectado a Supabase');
+    allOrders = data || [];
+  }
   renderAll();
 }
-function saveLocalFallback(){localStorage.setItem('cero_orders_local', JSON.stringify(allOrders));}
 
 supabaseClient.channel('cero_grados_orders_changes')
   .on('postgres_changes', { event: '*', schema: 'public', table: 'cero_grados_orders' }, payload => loadOrders())
-  .subscribe();
+  .subscribe((status) => {
+    if(status === 'SUBSCRIBED') {
+      console.log('Realtime conectado');
+    } else {
+      console.log('Realtime status:', status);
+    }
+  });
 
 function showView(view){
+  if(view==='caja' && !cashierUnlocked){
+    document.getElementById('cashierLoginModal').classList.add('show');
+    return;
+  }
   currentView=view;
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   const map={helados:0,caja:1,entregas:2,historial:3};
@@ -181,8 +232,15 @@ async function sendToCashier(){
   const c=calcOrder();
   const row={customer,notes,scoops:current.scoops,flavor:c.flavor,base:c.base,included:c.included,extras:c.extras,total:c.total,status:'pendiente_pago',history:[{event:'Pedido creado en Helados',at:now()}]};
   const {error}=await supabaseClient.from('cero_grados_orders').insert(row);
-  if(error){row.id=Date.now();row.created_at=new Date().toISOString();allOrders=[row,...allOrders];saveLocalFallback();}
-  clearOrder(); await loadOrders(); showView('caja');
+  if(error){
+    console.error('Error Supabase INSERT:', error);
+    setStatus('ERROR al guardar pedido');
+    alert('No se pudo guardar el pedido en Supabase. No se guardó localmente. Error: ' + (error.message || JSON.stringify(error)));
+    return;
+  }
+  clearOrder(); 
+  await loadOrders(); 
+  showView('caja');
 }
 function statusPill(s){return s==='pendiente_pago'?'<span class="pill yellow">Pendiente</span>':s==='pagado'?'<span class="pill green">Pagado / entregar</span>':s==='entregado'?'<span class="pill gray">Entregado</span>':'<span class="pill red">No entregado</span>';}
 function orderHtml(o,mode){
@@ -209,8 +267,14 @@ async function updateStatus(id,status){
   if(status==='entregado') patch.delivered_at=new Date().toISOString();
   if(status==='no_entregado') patch.not_delivered_at=new Date().toISOString();
   const {error}=await supabaseClient.from('cero_grados_orders').update(patch).eq('id',id);
-  if(error){Object.assign(order,patch);saveLocalFallback();}
-  await loadOrders(); if(status==='pagado') showView('entregas');
+  if(error){
+    console.error('Error Supabase UPDATE:', error);
+    setStatus('ERROR al actualizar pedido');
+    alert('No se pudo actualizar el pedido en Supabase. Error: ' + (error.message || JSON.stringify(error)));
+    return;
+  }
+  await loadOrders(); 
+  if(status==='pagado') showView('entregas');
 }
 function renderDeliveries(){
   const data=allOrders.filter(o=>o.status==='pagado');
