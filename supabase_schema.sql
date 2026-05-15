@@ -44,4 +44,4 @@ to anon
 using (true)
 with check (true);
 
-alter publication supabase_realtime add table public.cero_grados_orders;
+-- Realtime ya está activado para esta tabla.
