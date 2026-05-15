@@ -81,6 +81,17 @@ summary{padding:13px 14px;cursor:pointer;font-weight:950;background:#fff7f4;disp
 </div>
 
 <main>
+
+<section class="card" id="diagnosticBox" style="margin-bottom:14px;">
+  <h2>Estado de conexión Supabase</h2>
+  <p class="muted">Esta sección ayuda a validar si GitHub Pages sí está conectado a la base de datos.</p>
+  <div class="toolbar">
+    <button class="btn blue" onclick="testSupabaseConnection()">Probar conexión Supabase</button>
+    <button class="btn gray" onclick="loadOrders()">Actualizar pedidos</button>
+  </div>
+  <div id="diagnosticResult" class="empty" style="margin-top:10px;">Pendiente de prueba.</div>
+</section>
+
 <section id="view-helados" class="grid two">
   <div class="card order-form-card">
     <h2>Tomar pedido</h2>
@@ -129,6 +140,28 @@ function loginCashier(){
   }
 }
 
+
+
+async function testSupabaseConnection(){
+  const box = document.getElementById('diagnosticResult');
+  box.innerHTML = 'Probando conexión...';
+  const { data, error } = await supabaseClient
+    .from('cero_grados_orders')
+    .select('id, customer, status, created_at')
+    .limit(3);
+
+  if(error){
+    box.innerHTML = '<strong style="color:#bd2b2b;">No conecta con Supabase.</strong><br><br>' +
+      'Error: ' + (error.message || JSON.stringify(error)) + '<br><br>' +
+      'Revisa que hayas ejecutado <strong>supabase_schema.sql</strong> en Supabase y que exista la tabla <strong>cero_grados_orders</strong>.';
+    setStatus('ERROR Supabase');
+  } else {
+    box.innerHTML = '<strong style="color:#168a52;">Conexión correcta.</strong><br>' +
+      'Pedidos encontrados: ' + (data ? data.length : 0) + '<br>' +
+      'Ya puedes usar una computadora para Helados y otra para Caja.';
+    setStatus('Conectado a Supabase');
+  }
+}
 
 function money(n){return Number(n||0).toLocaleString('es-MX',{style:'currency',currency:'MXN'});}
 function now(){return new Date().toLocaleString('es-MX');}
