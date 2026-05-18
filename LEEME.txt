@@ -1,3 +1,7 @@
-Sube la carpeta descomprimida a GitHub Desktop. Abre con ?v=11 al final.
-Caja: usuario Caja / contraseña GoHobi2026
-Ejecuta supabase_schema.sql en Supabase.
+v12:
+- Ya permite vender SOLO MOCHIS sin bola de nieve.
+- Mochis en $55.
+- Todo sincroniza con Caja y Entregas.
+
+Abrir con:
+?v=12
