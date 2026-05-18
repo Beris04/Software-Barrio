@@ -1,0 +1,3 @@
+Sube la carpeta descomprimida a GitHub Desktop. Abre con ?v=11 al final.
+Caja: usuario Caja / contraseña GoHobi2026
+Ejecuta supabase_schema.sql en Supabase.
