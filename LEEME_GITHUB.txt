@@ -1,0 +1,19 @@
+Cero Grados POS v20
+
+1. Descomprime este ZIP.
+2. Sube la carpeta descomprimida a GitHub Desktop.
+3. Ejecuta supabase_schema.sql en Supabase.
+4. Publica en GitHub Pages.
+5. Abre la URL con ?v=20 para evitar caché.
+
+Caja:
+Usuario: Caja
+Contraseña: GoHobi2026
+
+Notas:
+- Solo Cero Grados.
+- Logo incluido.
+- Mochis se pueden vender solos.
+- Mochis $55.
+- Tapioca viene como topping.
+- Códigos no aparecen en selección, solo en Caja.
