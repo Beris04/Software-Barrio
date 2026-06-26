@@ -1,19 +1,19 @@
-Cero Grados POS v20
+Cero Grados POS v21 - Flujo con ticket físico
 
-1. Descomprime este ZIP.
-2. Sube la carpeta descomprimida a GitHub Desktop.
-3. Ejecuta supabase_schema.sql en Supabase.
-4. Publica en GitHub Pages.
-5. Abre la URL con ?v=20 para evitar caché.
+Nuevo flujo:
+1. Cero Grados captura pedido.
+2. Se imprime ticket.
+3. Cliente lleva ticket a Caja y paga.
+4. Cliente regresa con ticket pagado.
+5. Cero Grados entrega y marca Entregado.
 
-Caja:
-Usuario: Caja
-Contraseña: GoHobi2026
+Cambios:
+- Se eliminó módulo de Caja.
+- Se imprime ticket para pago.
+- Entregas muestra tickets generados.
+- Se puede reimprimir ticket.
+- Historial sigue funcionando.
+- Supabase sigue guardando pedidos e historial.
 
-Notas:
-- Solo Cero Grados.
-- Logo incluido.
-- Mochis se pueden vender solos.
-- Mochis $55.
-- Tapioca viene como topping.
-- Códigos no aparecen en selección, solo en Caja.
+Abrir con:
+?v=21
