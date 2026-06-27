@@ -1,0 +1,14 @@
+Cero Grados POS v60
+
+Versión visual rediseñada:
+- Interfaz más moderna tipo POS.
+- Botones más simétricos.
+- Iconos en botones principales.
+- Sin Caja digital.
+- Ticket para caja física.
+- Entregas e historial.
+- Supabase con respaldo local si la base falla.
+
+Sube la carpeta descomprimida a GitHub Desktop.
+Abre con:
+?v=60
