@@ -1,0 +1,4 @@
+Cero Grados v30 estable local.
+Sube la carpeta descomprimida a GitHub Desktop y abre con ?v=30.
+No usa Supabase.
+Toppings visibles y funcionales.
