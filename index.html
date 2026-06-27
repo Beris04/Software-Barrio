@@ -95,7 +95,7 @@ input,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radiu
     <button class="navbtn" onclick="view('historial')">📋 Historial</button>
     <div class="userbox">
       <b>Cero Grados 0°</b><br>
-      <small>POS v21 · Ticket a Caja</small>
+      <small>POS v22 · Ticket local/Supabase</small>
     </div>
   </aside>
 
@@ -192,7 +192,16 @@ const MOCHIS=[{"id": "mochi_1", "barcode": "002708", "sku": "CO-MTP900-14271", "
 const TOPPINGS=[{"id": "top_1", "sku": "SE-DGB302-13559", "name": "Lemon", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_2", "sku": "SE-DGB302-13560", "name": "Manzana Verde", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_3", "sku": "SE-DGB302-13558", "name": "Lychee", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_4", "sku": "SE-DGB302-13614", "name": "Kiwi", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_5", "sku": "SE-DGB302-14012", "name": "Maracuya", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_6", "sku": "SE-DGB302-12687", "name": "Uva", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_7", "sku": "SE-DGB302-12674", "name": "Platano", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_8", "sku": "SE-DGB302-12673", "name": "Mango", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_9", "sku": "SE-DGB302-12675", "name": "Durazno", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_10", "sku": "SE-DGB302-12676", "name": "Naranja", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_11", "sku": "SE-DGB302-11704", "name": "Yogurt Jelly", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_12", "sku": "SE-DGB303-8494", "name": "Pocky Almond Crush", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_13", "sku": "SE-DGB303-9582", "name": "Pocky Koi Fukami Matcha", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_14", "sku": "SE-DGB303-12396", "name": "Pocky Chocolate Japón", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_15", "sku": "SE-DGB303-3454", "name": "Pocky Fresa", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_16", "sku": "SE-DGB303-4008", "name": "Pocky Cookies & Cream", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_17", "sku": "SE-DGB303-4007", "name": "Pocky Chocolate Banana", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_18", "sku": "SE-DGB303-11771", "name": "Elise Leche De Hokkaido", "group": "Galletas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_19", "sku": "SE-DGB304-13849", "name": "Kancho Chocolate", "group": "Galletas", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_20", "sku": "SE-DGB303-13858", "name": "Pocky Chocolate Japón", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_21", "sku": "SE-DGB304-11074", "name": "Pocky Tsubu Tsubu Ichigo", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_22", "sku": "SE-DGB303-13501", "name": "Langrace", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_23", "sku": "SE-DGB309-13110", "name": "Choco Pie Cacao", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_24", "sku": "SE-DGB304-9945", "name": "French Pie Fresa", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_25", "sku": "SE-DGB304-10412", "name": "Sandwich Starawberry", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_26", "sku": "SE-DGB304-3595", "name": "Every Burger 66 G", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_27", "sku": "SE-DGB304-9947", "name": "Butter Ring Chocolate 103G", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_28", "sku": "SE-DGB301-13356", "name": "Kitkat Otona No Amasa Koi Matcha", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_29", "sku": "SE-DGB301-13354", "name": "Kitkat Otona No Amasa", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_30", "sku": "SE-DGB303-13353", "name": "Kitkat Mini", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_31", "sku": "SE-DGB303-13664", "name": "Kitkat Doble Frutos Rojos & Nueces", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_32", "sku": "SE-DGB303-13665", "name": "Kitkat Fresa Y Chocolate", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_33", "sku": "SE-DGB303-13666", "name": "Kitkat Chocolate Naranja", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": true}, {"id": "top_34", "sku": "SE-DGB304-13848", "name": "Kukkia Chocolate Con Leche", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_35", "sku": "SE-DGB304-13848", "name": "Kukkia Dark Chocolate", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_36", "sku": "SE-DGB304-13848", "name": "Kukkia Green Tea", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_37", "sku": "SE-DGB304-13848", "name": "Kukkia Fresa", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_38", "sku": "SE-DGB309-13089", "name": "Orion Fish Cake", "group": "Orion", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_39", "sku": "SE-DGB304-13844", "name": "Vainilla Almond", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_40", "sku": "SE-DGB304-13844", "name": "Red Hat", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_41", "sku": "SE-DGB304-13844", "name": "Caramel Choco Sandwich", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_42", "sku": "SE-DGB304-13844", "name": "Choco Crunch", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_43", "sku": "SE-DGB304-13844", "name": "Nuts Berry Heart", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_44", "sku": "SE-DGB304-13844", "name": "White Choco Almond", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_45", "sku": "SE-DGB304-13844", "name": "Strawberry Cookie", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_46", "sku": "SE-DGB304-13844", "name": "Choco Cookie", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_47", "sku": "SE-DGB304-13844", "name": "Langue De Chat Roll", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_48", "sku": "SE-DGB304-13844", "name": "Florentins Cookie", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_49", "sku": "SE-DGB309-13907", "name": "Orion Bichobi Chocolate", "group": "Orion", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "top_50", "sku": "SE-DGB304-13844", "name": "White Choco Ball", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "", "extraBarcode": "", "oneAllowed": false}, {"id": "tapioca", "sku": "OT-DEL299-14018", "name": "Tapioca", "group": "Gomitas", "kind": "Premium", "extraPrice": 15, "includedBarcode": "002575", "extraBarcode": "002575", "oneAllowed": true}];
 
 let orders=[];
+let supabaseOK=false;
 let cajaUnlocked=false;
+
+function localOrders(){
+  return JSON.parse(localStorage.getItem("cero_grados_orders_local") || "[]");
+}
+function saveLocalOrders(data){
+  localStorage.setItem("cero_grados_orders_local", JSON.stringify(data));
+}
+
 let filterGroup="Todos";
 let current={
   type:"helado",
@@ -208,8 +217,16 @@ function statusText(t, ok=true){const s=document.getElementById("status");s.text
 
 async function loadOrders(){
   const {data,error}=await db.from("cero_grados_orders").select("*").order("created_at",{ascending:false});
-  if(error){console.error(error);statusText("Supabase error",false);orders=[];}
-  else{orders=data||[];statusText("Conectado",true);}
+  if(error){
+    console.error("Supabase error:", error);
+    supabaseOK=false;
+    orders=localOrders();
+    statusText("Modo local",false);
+  } else {
+    supabaseOK=true;
+    orders=data||[];
+    statusText("Conectado",true);
+  }
   renderAll();
 }
 try{
@@ -362,9 +379,22 @@ async function sendOrder(){
     status:"ticket_impreso",
     history:[{event:"Pedido creado",at:new Date().toLocaleString("es-MX")}]
   };
-  const {error}=await db.from("cero_grados_orders").insert(row);
-  if(error){console.error(error);return alert("No guardó en Supabase. Ejecuta supabase_schema.sql.");}
-  const savedOrder = {...row, id: Date.now()};
+  let savedOrder = {...row, id: Date.now(), created_at: new Date().toISOString()};
+  if(supabaseOK){
+    const {data,error}=await db.from("cero_grados_orders").insert(row).select().single();
+    if(error){
+      console.error("No guardó en Supabase, usando local:", error);
+      const local=localOrders();
+      local.unshift(savedOrder);
+      saveLocalOrders(local);
+    } else {
+      savedOrder=data;
+    }
+  } else {
+    const local=localOrders();
+    local.unshift(savedOrder);
+    saveLocalOrders(local);
+  }
   printOrderTicket(savedOrder);
   clearOrder();
   await loadOrders();
@@ -411,13 +441,34 @@ function renderHistory(){
 
 async function statusUpdate(id,status){
   const o=orders.find(x=>String(x.id)===String(id));
+  if(!o) return;
   const history=[...(o.history||[]),{event:`Cambio a ${status}`,at:new Date().toLocaleString("es-MX")}];
   const patch={status,history};
   if(status==="pagado") patch.paid_at=new Date().toISOString();
   if(status==="entregado") patch.delivered_at=new Date().toISOString();
   if(status==="no_entregado") patch.not_delivered_at=new Date().toISOString();
-  const {error}=await db.from("cero_grados_orders").update(patch).eq("id",id);
-  if(error) return alert("No se pudo actualizar.");
+
+  if(supabaseOK && !String(id).startsWith("local")){
+    const {error}=await db.from("cero_grados_orders").update(patch).eq("id",id);
+    if(error){
+      console.error(error);
+      alert("No se pudo actualizar en Supabase. Se actualizará local.");
+    }
+  }
+
+  const local=localOrders();
+  const localIndex=local.findIndex(x=>String(x.id)===String(id));
+  if(localIndex>=0){
+    local[localIndex]={...local[localIndex],...patch};
+    saveLocalOrders(local);
+  } else if(!supabaseOK) {
+    const idx=orders.findIndex(x=>String(x.id)===String(id));
+    if(idx>=0){
+      orders[idx]={...orders[idx],...patch};
+      saveLocalOrders(orders);
+    }
+  }
+
   await loadOrders();
   if(status==="pagado") view("entregas");
 }

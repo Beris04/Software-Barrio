@@ -1,19 +1,18 @@
-Cero Grados POS v21 - Flujo con ticket físico
+Cero Grados POS v22
 
-Nuevo flujo:
-1. Cero Grados captura pedido.
-2. Se imprime ticket.
-3. Cliente lleva ticket a Caja y paga.
-4. Cliente regresa con ticket pagado.
-5. Cero Grados entrega y marca Entregado.
+Esta versión funciona aunque Supabase falle:
+- Si Supabase conecta: guarda en Supabase.
+- Si Supabase marca error: guarda local en la computadora y permite imprimir ticket.
 
-Cambios:
-- Se eliminó módulo de Caja.
-- Se imprime ticket para pago.
-- Entregas muestra tickets generados.
-- Se puede reimprimir ticket.
-- Historial sigue funcionando.
-- Supabase sigue guardando pedidos e historial.
+Flujo:
+1. Captura pedido.
+2. Imprime ticket.
+3. Cliente paga en Caja.
+4. Regresa con ticket.
+5. Cero Grados marca Entregado.
 
 Abrir con:
-?v=21
+?v=22
+
+Si quieres usar Supabase:
+Ejecuta supabase_schema.sql en Supabase.
