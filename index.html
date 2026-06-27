@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cero Grados v31</title>
+<title>Cero Grados v40</title>
 <style>
 :root{--bg:#f7efec;--card:#fffaf8;--ink:#271816;--muted:#725753;--line:#eadbd7;--brand:#873f38;--blue:#2563eb;--green:#15803d;--red:#b91c1c;--gray:#64748b;--orange:#ea580c}
 *{box-sizing:border-box}
@@ -67,6 +67,7 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 }
 @media(max-width:1100px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.grid{grid-template-columns:1fr}.summary{position:relative;height:auto}.scroll{height:auto}.flavors{grid-template-columns:repeat(2,1fr)}.orders2,.orders3{grid-template-columns:1fr}.products{grid-template-columns:1fr}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="app">
@@ -75,7 +76,7 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 <button class="nav active" onclick="view('nuevo')">➕ Nuevo pedido</button>
 <button class="nav" onclick="view('entregas')">🧾 Tickets / Entregas <span class="badge" id="entregaCount">0</span></button>
 <button class="nav" onclick="view('historial')">📋 Historial</button>
-<div style="position:absolute;bottom:18px;left:18px;right:18px;color:#dbeafe;border-top:1px solid rgba(255,255,255,.18);padding-top:12px"><b>Cero Grados 0°</b><br><small>v31 estética local</small></div>
+<div style="position:absolute;bottom:18px;left:18px;right:18px;color:#dbeafe;border-top:1px solid rgba(255,255,255,.18);padding-top:12px"><b>Cero Grados 0°</b><br><small>v40 Supabase</small></div>
 </aside>
 <main class="main">
 <section id="viewNuevo" class="grid">
@@ -117,7 +118,7 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 </aside>
 </section>
 <section id="viewEntregas" class="panel" style="display:none">
-<h1>Tickets / Entregas</h1>
+<h1>Tickets / Entregas</h1><div class="actions"><button class="btn blue" onclick="loadOrders()">Actualizar</button><button class="btn gray" onclick="testSupabase()">Probar Supabase</button></div><div id="dbMessage" class="empty" style="display:none;margin:10px 0"></div>
 <div id="deliveryOrders" class="orders2"></div>
 </section>
 <section id="viewHistorial" class="panel" style="display:none">
@@ -130,6 +131,22 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 <div id="codesModal" class="modal"><div class="modalbox"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Detalle / códigos</h2><button class="btn red" onclick="closeCodes()">Cerrar</button></div><div id="codesContent"></div></div></div>
 <div id="printTicket" style="display:none"></div>
 <script>
+const SUPABASE_URL="https://rnggpjnxfllrcvhorwth.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuZ2dwam54ZmxscmN2aG9yd3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODg2OTYsImV4cCI6MjA5NDM2NDY5Nn0.Y5ZHVluNN6OIboG4MYSNiDnP9RlN9otCyuWPm5Cyhro";
+const db=window.supabase ? window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY) : null;
+let supabaseOK=false;
+function setSyncStatus(text,ok=false){
+  const el=document.getElementById("syncStatus");
+  if(el){el.textContent=text;el.style.color=ok?"#86efac":"#fca5a5";}
+}
+function showDbMessage(text){
+  const el=document.getElementById("dbMessage");
+  if(el){el.style.display="block";el.innerHTML=text;}
+}
+function hideDbMessage(){
+  const el=document.getElementById("dbMessage");
+  if(el) el.style.display="none";
+}
 const FLAVORS=[{"id": "matcha", "name": "Matcha", "barcode": "002896", "sku": "CO-DEL900-14395", "price1": 65, "price2": 95}, {"id": "taro", "name": "Taro", "barcode": "002897", "sku": "CO-DEL900-14396", "price1": 65, "price2": 95}, {"id": "sake", "name": "Sake", "barcode": "002898", "sku": "CO-DEL900-14397", "price1": 65, "price2": 95}, {"id": "lychee", "name": "Lychee", "barcode": "002899", "sku": "CO-DEL900-14398", "price1": 65, "price2": 95}, {"id": "yuzu", "name": "Yuzu", "barcode": "002900", "sku": "CO-DEL900-14399", "price1": 65, "price2": 95}];
 const MOCHIS=[{"id": "m1", "name": "Mochi Café Con Leche", "barcode": "002708", "sku": "CO-MTP900-14271", "price": 55}, {"id": "m2", "name": "Mochi Caramel Macchiato", "barcode": "002705", "sku": "CO-MTP900-14268", "price": 55}, {"id": "m3", "name": "Mochi Doble Mango", "barcode": "002710", "sku": "CO-MTP900-14273", "price": 55}, {"id": "m4", "name": "Mochi Flan De Caramelo", "barcode": "002711", "sku": "CO-MTP900-14274", "price": 55}, {"id": "m5", "name": "Mochi Matcha Ujikintoki", "barcode": "002709", "sku": "CO-MTP900-14272", "price": 55}, {"id": "m6", "name": "Mochi Pastel De Fresa", "barcode": "002707", "sku": "CO-MTP900-14270", "price": 55}, {"id": "m7", "name": "Mochi Yogurt Arándano", "barcode": "002706", "sku": "CO-MTP900-14269", "price": 55}];
 const TOPPINGS=[{"id": "tapioca", "name": "Tapioca", "sku": "OT-DEL299-14018", "barcode": "002575", "group": "Gomitas", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t1", "name": "Lemon", "sku": "SE-DGB302-13559", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t2", "name": "Manzana Verde", "sku": "SE-DGB302-13560", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t3", "name": "Lychee", "sku": "SE-DGB302-13558", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t4", "name": "Kiwi", "sku": "SE-DGB302-13614", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t5", "name": "Maracuya", "sku": "SE-DGB302-14012", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t6", "name": "Uva", "sku": "SE-DGB302-12687", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t7", "name": "Platano", "sku": "SE-DGB302-12674", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t8", "name": "Mango", "sku": "SE-DGB302-12673", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t9", "name": "Durazno", "sku": "SE-DGB302-12675", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t10", "name": "Naranja", "sku": "SE-DGB302-12676", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t11", "name": "Yogurt Jelly", "sku": "SE-DGB302-11704", "barcode": "", "group": "Gomitas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t12", "name": "Pocky Almond Crush", "sku": "SE-DGB303-8494", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t13", "name": "Pocky Koi Fukami Matcha", "sku": "SE-DGB303-9582", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t14", "name": "Pocky Chocolate Japón", "sku": "SE-DGB303-12396", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t15", "name": "Pocky Fresa", "sku": "SE-DGB303-3454", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t16", "name": "Pocky Cookies & Cream", "sku": "SE-DGB303-4008", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t17", "name": "Pocky Chocolate Banana", "sku": "SE-DGB303-4007", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t18", "name": "Elise Leche De Hokkaido", "sku": "SE-DGB303-11771", "barcode": "", "group": "Galletas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": false}, {"id": "t19", "name": "Kancho Chocolate", "sku": "SE-DGB304-13849", "barcode": "", "group": "Galletas", "kind": "Clásico", "extraPrice": 7, "oneAllowed": false}, {"id": "t20", "name": "Pocky Tsubu Tsubu Ichigo", "sku": "SE-DGB304-11074", "barcode": "", "group": "Pocky", "kind": "Clásico", "extraPrice": 7, "oneAllowed": true}, {"id": "t21", "name": "Langrace", "sku": "SE-DGB303-13501", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t22", "name": "Choco Pie Cacao", "sku": "SE-DGB309-13110", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t23", "name": "French Pie Fresa", "sku": "SE-DGB304-9945", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t24", "name": "Sandwich Starawberry", "sku": "SE-DGB304-10412", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t25", "name": "Every Burger 66 G", "sku": "SE-DGB304-3595", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t26", "name": "Butter Ring Chocolate 103G", "sku": "SE-DGB304-9947", "barcode": "", "group": "Galletas", "kind": "Especial", "extraPrice": 12, "oneAllowed": false}, {"id": "t27", "name": "Kitkat Otona No Amasa Koi Matcha", "sku": "SE-DGB301-13356", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t28", "name": "Kitkat Otona No Amasa", "sku": "SE-DGB301-13354", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t29", "name": "Kitkat Mini", "sku": "SE-DGB303-13353", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t30", "name": "Kitkat Doble Frutos Rojos & Nueces", "sku": "SE-DGB303-13664", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t31", "name": "Kitkat Fresa Y Chocolate", "sku": "SE-DGB303-13665", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t32", "name": "Kitkat Chocolate Naranja", "sku": "SE-DGB303-13666", "barcode": "", "group": "KitKat", "kind": "Premium", "extraPrice": 15, "oneAllowed": true}, {"id": "t33", "name": "Kukkia Chocolate Con Leche", "sku": "SE-DGB304-13848", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t34", "name": "Kukkia Dark Chocolate", "sku": "SE-DGB304-13848", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t35", "name": "Kukkia Green Tea", "sku": "SE-DGB304-13848", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t36", "name": "Kukkia Fresa", "sku": "SE-DGB304-13848", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t37", "name": "Orion Fish Cake", "sku": "SE-DGB309-13089", "barcode": "", "group": "Orion", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t38", "name": "Vainilla Almond", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t39", "name": "Red Hat", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t40", "name": "Caramel Choco Sandwich", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t41", "name": "Choco Crunch", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t42", "name": "Nuts Berry Heart", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t43", "name": "White Choco Almond", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t44", "name": "Strawberry Cookie", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t45", "name": "Choco Cookie", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t46", "name": "Langue De Chat Roll", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t47", "name": "Florentins Cookie", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t48", "name": "Orion Bichobi Chocolate", "sku": "SE-DGB309-13907", "barcode": "", "group": "Orion", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}, {"id": "t49", "name": "White Choco Ball", "sku": "SE-DGB304-13844", "barcode": "", "group": "Galletas", "kind": "Premium", "extraPrice": 15, "oneAllowed": false}];
@@ -138,9 +155,35 @@ let orders=[];
 let current={type:"helado",scoops:1,activeFlavor:0,flavors:[FLAVORS[0].id,FLAVORS[0].id],toppings:{},mochis:{}};
 
 function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",currency:"MXN"})}
-function getOrders(){return JSON.parse(localStorage.getItem("cero_v30_orders")||"[]")}
-function saveOrders(data){localStorage.setItem("cero_v30_orders",JSON.stringify(data))}
-function loadOrders(){orders=getOrders();renderAll()}
+function getOrders(){return JSON.parse(localStorage.getItem("cero_v40_orders_local")||"[]")}
+function saveOrders(data){localStorage.setItem("cero_v40_orders_local",JSON.stringify(data))}
+async function loadOrders(){
+  if(!db){
+    supabaseOK=false;
+    orders=getOrders();
+    setSyncStatus("Modo local",false);
+    renderAll();
+    return;
+  }
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("Tiempo agotado")),3500));
+  try{
+    const result=await Promise.race([
+      db.from("cero_grados_orders").select("*").order("created_at",{ascending:false}),
+      timeout
+    ]);
+    if(result.error) throw result.error;
+    supabaseOK=true;
+    orders=result.data||[];
+    setSyncStatus("Supabase conectado",true);
+    hideDbMessage();
+  }catch(e){
+    console.warn("Supabase no disponible, usando local:",e);
+    supabaseOK=false;
+    orders=getOrders();
+    setSyncStatus("Modo local respaldo",false);
+  }
+  renderAll();
+}
 
 function view(v){
  document.querySelectorAll(".nav").forEach(b=>b.classList.remove("active"));
@@ -185,20 +228,130 @@ function calc(){
 }
 function renderSummary(){const c=calc();let lines=[];if(current.type==="helado")lines.push(`<div class="line"><span>${current.scoops} bola(s) · ${c.flavor.name}</span><b>${money(c.base)}</b></div>`);else lines.push(`<div class="line"><span>Solo Mochis</span><b>$0.00</b></div>`);c.mochiItems.forEach(m=>lines.push(`<div class="line"><span>${m.qty} x ${m.name}</span><b>${money(m.subtotal)}</b></div>`));if(current.type==="helado"){lines.push(`<div class="line"><span>Toppings incluidos (${c.included.length}/4)</span><b>$0.00</b></div>`);c.included.forEach(t=>lines.push(`<div class="line"><span>✔ ${t.name}</span><b>Incluido</b></div>`))}lines.push(`<div class="line"><span>Extras (${c.extras.length})</span><b>${money(c.extraTotal)}</b></div>`);c.extras.forEach(t=>lines.push(`<div class="line"><span>+ ${t.name}</span><b>${money(t.extraPrice)}</b></div>`));document.getElementById("summary").innerHTML=lines.join("")||`<div class="empty">Sin productos</div>`;document.getElementById("total").textContent=money(c.total)}
 function clearOrder(){current={type:"helado",scoops:1,activeFlavor:0,flavors:[FLAVORS[0].id,FLAVORS[0].id],toppings:{},mochis:{}};document.getElementById("customer").value="";document.getElementById("notes").value="";setType("helado");setScoops(1)}
-function sendOrder(){const customer=document.getElementById("customer").value.trim();const c=calc();if(!customer)return alert("Captura nombre o mesa");if(c.total<=0)return alert("Agrega un producto");const order={id:"T"+Date.now(),created_at:new Date().toISOString(),customer,notes:document.getElementById("notes").value,type:current.type,scoops:current.type==="helado"?current.scoops:0,flavor:c.flavor,base:c.base,included:c.included,extras:c.extras,mochis:c.mochiItems,total:c.total,status:"ticket_impreso",history:[{event:"Ticket impreso",at:new Date().toLocaleString("es-MX")}]} ;const data=getOrders();data.unshift(order);saveOrders(data);printTicket(order);clearOrder();loadOrders();view("entregas")}
+async function sendOrder(){
+  const customer=document.getElementById("customer").value.trim();
+  const c=calc();
+  if(!customer)return alert("Captura nombre o mesa");
+  if(c.total<=0)return alert("Agrega un producto");
+  const order={
+    created_at:new Date().toISOString(),
+    customer,
+    notes:document.getElementById("notes").value,
+    type:current.type,
+    product_type:current.type,
+    scoops:current.type==="helado"?current.scoops:0,
+    flavor:c.flavor,
+    base:c.base,
+    included:c.included,
+    extras:c.extras,
+    mochis:c.mochiItems,
+    total:c.total,
+    status:"ticket_impreso",
+    history:[{event:"Ticket impreso",at:new Date().toLocaleString("es-MX")}]
+  };
+  let saved={...order,id:"local_"+Date.now()};
+  if(supabaseOK && db){
+    const {data,error}=await db.from("cero_grados_orders").insert(order).select().single();
+    if(error){
+      console.error("No guardó en Supabase, guardando local:",error);
+      const local=getOrders(); local.unshift(saved); saveOrders(local);
+      setSyncStatus("Modo local respaldo",false);
+    }else{
+      saved=data;
+    }
+  }else{
+    const local=getOrders(); local.unshift(saved); saveOrders(local);
+  }
+  printTicket(saved);
+  clearOrder();
+  await loadOrders();
+  view("entregas");
+}
 function buildTicket(o){let rows=[];if(o.scoops>0)rows.push(`<div><b>${o.scoops} bola(s)</b> ${o.flavor.name} <span>${money(o.base)}</span></div>`);(o.mochis||[]).forEach(m=>rows.push(`<div>${m.qty} x ${m.name} <span>${money(m.subtotal)}</span></div>`));if((o.included||[]).length){rows.push("<hr><b>INCLUIDOS</b>");o.included.forEach(t=>rows.push(`<div>✔ ${t.name}</div>`))}if((o.extras||[]).length){rows.push("<hr><b>EXTRAS</b>");o.extras.forEach(t=>rows.push(`<div>+ ${t.name} <span>${money(t.extraPrice)}</span></div>`))}return `<div style="text-align:center"><h2>CERO GRADOS 0°</h2><div>Ticket para pago en Caja</div><h1>#${String(o.id).slice(-5)}</h1></div><hr><b>Cliente/Mesa:</b> ${o.customer}<br><b>Fecha:</b> ${new Date().toLocaleString("es-MX")}<hr>${rows.join("")}<hr><div style="display:flex;justify-content:space-between;font-size:20px;font-weight:900"><span>TOTAL</span><span>${money(o.total)}</span></div><hr><div style="text-align:center;font-size:12px">Pagar en Caja y regresar ticket para entrega.</div>`}
 function printTicket(o){const box=document.getElementById("printTicket");box.innerHTML=buildTicket(o);box.style.display="block";window.print();setTimeout(()=>box.style.display="none",500)}
 function pill(s){return `<span class="pill">${s==="ticket_impreso"?"Ticket impreso":s==="entregado"?"Entregado":s==="no_entregado"?"No entregado":s}</span>`}
 function orderHTML(o,mode){let rows=[];if(o.scoops>0)rows.push(`<div class="line"><span>${o.scoops} bola(s) · ${o.flavor.name}</span><b>${money(o.base)}</b></div>`);(o.mochis||[]).forEach(m=>rows.push(`<div class="line"><span>${m.qty} x ${m.name}</span><b>${money(m.subtotal)}</b></div>`));(o.included||[]).forEach(t=>rows.push(`<div class="line"><span>✔ ${t.name}</span><b>$0</b></div>`));(o.extras||[]).forEach(t=>rows.push(`<div class="line"><span>+ ${t.name}</span><b>${money(t.extraPrice)}</b></div>`));return `<div class="order ${o.status}"><div class="orderhead"><div><h3>${o.customer}</h3>${pill(o.status)}</div><div class="total">${money(o.total)}</div></div>${rows.join("")}<p>${o.notes||""}</p><div class="actions">${mode==="delivery"?`<button class="btn blue" onclick="reprint('${o.id}')">Reimprimir</button><button class="btn green" onclick="setStatusOrder('${o.id}','entregado')">Entregado</button><button class="btn red" onclick="setStatusOrder('${o.id}','no_entregado')">No entregado</button>`:`<button class="btn blue" onclick="detail('${o.id}')">Detalle</button>`}</div></div>`}
-function renderDeliveries(){const arr=orders.filter(o=>o.status==="ticket_impreso");document.getElementById("deliveryOrders").innerHTML=arr.length?arr.map(o=>orderHTML(o,"delivery")).join(""):`<div class="empty">Sin tickets pendientes</div>`;document.getElementById("entregaCount").textContent=arr.length}
+function renderDeliveries(){const arr=orders.filter(o=>o.status==="ticket_impreso" || o.status==="pagado");document.getElementById("deliveryOrders").innerHTML=arr.length?arr.map(o=>orderHTML(o,"delivery")).join(""):`<div class="empty">Sin tickets pendientes</div>`;document.getElementById("entregaCount").textContent=arr.length}
 function renderHistory(){const arr=orders.filter(o=>o.status==="entregado"||o.status==="no_entregado");document.getElementById("historyOrders").innerHTML=arr.length?arr.map(o=>orderHTML(o,"history")).join(""):`<div class="empty">Sin historial</div>`}
-function setStatusOrder(id,status){const data=getOrders();const i=data.findIndex(o=>o.id===id);if(i>=0){data[i].status=status;data[i].history=[...(data[i].history||[]),{event:status,at:new Date().toLocaleString("es-MX")}];saveOrders(data)}loadOrders()}
+async function setStatusOrder(id,status){
+  const historyItem={event:status,at:new Date().toLocaleString("es-MX")};
+  const patch={status};
+  if(status==="entregado")patch.delivered_at=new Date().toISOString();
+  if(status==="no_entregado")patch.not_delivered_at=new Date().toISOString();
+
+  if(supabaseOK && db && !String(id).startsWith("local_")){
+    const currentOrder=orders.find(o=>String(o.id)===String(id));
+    patch.history=[...(currentOrder?.history||[]),historyItem];
+    const {error}=await db.from("cero_grados_orders").update(patch).eq("id",id);
+    if(error){
+      console.error(error);
+      alert("No se pudo actualizar en Supabase. Se guardará local si existe respaldo.");
+    }
+  }else{
+    const data=getOrders();
+    const i=data.findIndex(o=>String(o.id)===String(id));
+    if(i>=0){
+      data[i].status=status;
+      data[i].history=[...(data[i].history||[]),historyItem];
+      if(status==="entregado")data[i].delivered_at=new Date().toISOString();
+      if(status==="no_entregado")data[i].not_delivered_at=new Date().toISOString();
+      saveOrders(data);
+    }
+  }
+  await loadOrders();
+}
 function reprint(id){const o=orders.find(x=>x.id===id);if(o)printTicket(o)}
 function detail(id){const o=orders.find(x=>x.id===id);document.getElementById("codesContent").innerHTML=buildTicket(o);document.getElementById("codesModal").classList.add("show")}
 function closeCodes(){document.getElementById("codesModal").classList.remove("show")}
 function exportCSV(){const headers=["ID","Cliente","Estado","Total","Tipo","Sabor","Bolas"];const rows=orders.map(o=>[o.id,o.customer,o.status,o.total,o.type,o.flavor.name,o.scoops]);const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="historial_cero_grados.csv";a.click()}
 function clearHistory(){if(confirm("¿Borrar pedidos locales?")){localStorage.removeItem("cero_v30_orders");loadOrders()}}
 function renderAll(){renderFlavors();renderMochis();renderFilters();renderToppings();renderSummary();renderDeliveries();renderHistory()}
+
+async function testSupabase(){
+  if(!db){showDbMessage("Supabase no está disponible en este navegador.");return;}
+  try{
+    const {data,error}=await db.from("cero_grados_orders").select("id,customer,status,total,created_at").limit(3);
+    if(error) throw error;
+    showDbMessage("<b style='color:#15803d'>Supabase conectado correctamente.</b><br>Registros encontrados: "+(data?data.length:0));
+    setSyncStatus("Supabase conectado",true);
+  }catch(e){
+    console.error(e);
+    showDbMessage("<b style='color:#b91c1c'>No conecta con Supabase.</b><br>"+(e.message||JSON.stringify(e))+"<br><br>Ejecuta supabase_schema.sql y revisa URL / anon key.");
+    setSyncStatus("Modo local respaldo",false);
+  }
+}
+
+if(db){
+  try{
+    db.channel("cero_grados_v40_live")
+      .on("postgres_changes",{event:"*",schema:"public",table:"cero_grados_orders"},()=>loadOrders())
+      .subscribe();
+  }catch(e){console.warn(e);}
+}
+
+
+async function testSupabase(){
+  if(!db){showDbMessage("Supabase no está disponible en este navegador.");return;}
+  try{
+    const {data,error}=await db.from("cero_grados_orders").select("id,customer,status,total,created_at").limit(3);
+    if(error) throw error;
+    showDbMessage("<b style='color:#15803d'>Supabase conectado correctamente.</b><br>Registros encontrados: "+(data?data.length:0));
+    setSyncStatus("Supabase conectado",true);
+  }catch(e){
+    console.error(e);
+    showDbMessage("<b style='color:#b91c1c'>No conecta con Supabase.</b><br>"+(e.message||JSON.stringify(e))+"<br><br>Ejecuta supabase_schema.sql y revisa URL / anon key.");
+    setSyncStatus("Modo local respaldo",false);
+  }
+}
+
+if(db){
+  try{
+    db.channel("cero_grados_v40_live")
+      .on("postgres_changes",{event:"*",schema:"public",table:"cero_grados_orders"},()=>loadOrders())
+      .subscribe();
+  }catch(e){console.warn(e);}
+}
+
 setType("helado");loadOrders();
 </script>
 </body>

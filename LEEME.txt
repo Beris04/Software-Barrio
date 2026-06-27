@@ -1,10 +1,19 @@
-Cero Grados v31 estética local.
+Cero Grados v40 Supabase - Sin Caja digital
 
-Cambios:
-- Botones más simétricos.
-- Mochis solo aparecen al seleccionar Solo Mochis.
-- Tapioca tiene filtro propio junto a Orion.
-- Sigue en modo local: el historial solo se ve en la computadora donde se capturó.
+Flujo:
+1. Cero Grados captura pedido.
+2. Imprime ticket.
+3. Cliente paga en Caja física con el ticket.
+4. Cliente regresa a Cero Grados.
+5. Cero Grados marca Entregado o No entregado.
+6. Historial queda en Supabase y se comparte entre computadoras.
 
-Abrir con:
-?v=31
+Importante:
+- No incluye módulo de Caja digital.
+- Si Supabase falla, usa modo local de respaldo para no detener operación.
+- Para compartir historial entre computadoras, Supabase debe conectar correctamente.
+
+Pasos:
+1. Ejecuta supabase_schema.sql en Supabase.
+2. Sube esta carpeta descomprimida a GitHub Desktop.
+3. Abre la página con ?v=40.
