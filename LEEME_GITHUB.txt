@@ -1,9 +1,17 @@
-Cero Grados POS v23
+Cero Grados POS v25 - Entregas e Historial Local
 
 Corrección:
-- Si Supabase tarda o falla, en 3 segundos cambia a Modo local.
-- Ya no se queda atorado en "Conectando...".
-- Permite capturar pedido e imprimir ticket aunque Supabase falle.
+- Al imprimir ticket, el pedido queda en Tickets / Entregas.
+- Al marcar Entregado o No entregado, pasa al Historial.
+- Todo funciona en modo local sin Supabase.
+
+Flujo:
+1. Captura pedido.
+2. Imprime ticket.
+3. Cliente paga en Caja.
+4. Cliente regresa con ticket.
+5. Cero Grados marca Entregado o No entregado.
+6. El pedido pasa al Historial.
 
 Abrir con:
-?v=23
+?v=25

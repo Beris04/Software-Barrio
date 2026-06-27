@@ -1,7 +1,0 @@
-v12:
-- Ya permite vender SOLO MOCHIS sin bola de nieve.
-- Mochis en $55.
-- Todo sincroniza con Caja y Entregas.
-
-Abrir con:
-?v=12

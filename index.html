@@ -95,7 +95,7 @@ input,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radiu
     <button class="navbtn" onclick="view('historial')">📋 Historial</button>
     <div class="userbox">
       <b>Cero Grados 0°</b><br>
-      <small>POS v23 · Modo local rápido</small>
+      <small>POS v25 · Local entregas</small>
     </div>
   </aside>
 
@@ -107,7 +107,7 @@ input,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radiu
         <div class="step">3 Toppings</div>
         <div class="step">4 Imprimir</div>
       </div>
-      <div class="status" id="status">Conectando...</div>
+      <div class="status" id="status" style="color:#b91c1c">Modo local</div>
     </div>
 
     <section id="viewNuevo" class="grid">
@@ -216,30 +216,9 @@ function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",c
 function statusText(t, ok=true){const s=document.getElementById("status");s.textContent=t;s.style.color=ok?"#15803d":"#b91c1c"}
 
 async function loadOrders(){
-  statusText("Cargando...", false);
-
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Tiempo agotado Supabase")), 3000)
-  );
-
-  const queryPromise = db
-    .from("cero_grados_orders")
-    .select("*")
-    .order("created_at", {ascending:false});
-
-  try{
-    const result = await Promise.race([queryPromise, timeoutPromise]);
-    if(result.error) throw result.error;
-    supabaseOK=true;
-    orders=result.data||[];
-    statusText("Conectado",true);
-  }catch(e){
-    console.warn("Usando modo local:", e);
-    supabaseOK=false;
-    orders=localOrders();
-    statusText("Modo local",false);
-  }
-
+  supabaseOK=false;
+  orders=localOrders();
+  statusText("Modo local",false);
   renderAll();
 }
 try{
@@ -392,22 +371,10 @@ async function sendOrder(){
     status:"ticket_impreso",
     history:[{event:"Pedido creado",at:new Date().toLocaleString("es-MX")}]
   };
-  let savedOrder = {...row, id: Date.now(), created_at: new Date().toISOString()};
-  if(supabaseOK){
-    const {data,error}=await db.from("cero_grados_orders").insert(row).select().single();
-    if(error){
-      console.error("No guardó en Supabase, usando local:", error);
-      const local=localOrders();
-      local.unshift(savedOrder);
-      saveLocalOrders(local);
-    } else {
-      savedOrder=data;
-    }
-  } else {
-    const local=localOrders();
-    local.unshift(savedOrder);
-    saveLocalOrders(local);
-  }
+  let savedOrder = {...row, id: "local_" + Date.now(), created_at: new Date().toISOString()};
+  const local=localOrders();
+  local.unshift(savedOrder);
+  saveLocalOrders(local);
   printOrderTicket(savedOrder);
   clearOrder();
   await loadOrders();
@@ -415,11 +382,11 @@ async function sendOrder(){
 }
 
 function pill(s){
-  if(s==="ticket_impreso") return `<span class="pill">Ticket impreso / pasa a Caja</span>`;
-  if(s==="pendiente_pago") return `<span class="pill">Pendiente</span>`;
+  if(s==="ticket_impreso") return `<span class="pill">Ticket impreso</span>`;
   if(s==="pagado") return `<span class="pill">Pagado</span>`;
   if(s==="entregado") return `<span class="pill">Entregado</span>`;
-  return `<span class="pill">No entregado</span>`;
+  if(s==="no_entregado") return `<span class="pill">No entregado</span>`;
+  return `<span class="pill">${s||"Pendiente"}</span>`;
 }
 
 function orderHTML(o,mode){
@@ -445,45 +412,35 @@ function renderCashier(){
 }
 function renderDeliveries(){
   const arr=orders.filter(o=>o.status==="ticket_impreso" || o.status==="pagado");
-  document.getElementById("deliveryOrders").innerHTML=arr.length?arr.map(o=>orderHTML(o,"delivery")).join(""):`<div class="empty">Sin tickets pendientes de entrega.</div>`;
+  document.getElementById("deliveryOrders").innerHTML=arr.length
+    ? arr.map(o=>orderHTML(o,"delivery")).join("")
+    : `<div class="empty">Sin tickets pendientes de entrega.</div>`;
 }
 function renderHistory(){
-  document.getElementById("historyOrders").innerHTML=orders.length?orders.map(o=>orderHTML(o,"history")).join(""):`<div class="empty">Sin historial.</div>`;
-  document.getElementById("entregaCount").textContent=orders.filter(o=>o.status==="ticket_impreso" || o.status==="pagado").length;
+  const hist=orders.filter(o=>o.status==="entregado" || o.status==="no_entregado");
+  document.getElementById("historyOrders").innerHTML=hist.length
+    ? hist.map(o=>orderHTML(o,"history")).join("")
+    : `<div class="empty">Sin historial de entregas.</div>`;
+  const cajaBadge=document.getElementById("cajaCount");
+  if(cajaBadge) cajaBadge.textContent=orders.filter(o=>o.status==="ticket_impreso").length;
+  const entregaBadge=document.getElementById("entregaCount");
+  if(entregaBadge) entregaBadge.textContent=orders.filter(o=>o.status==="ticket_impreso" || o.status==="pagado").length;
 }
 
 async function statusUpdate(id,status){
-  const o=orders.find(x=>String(x.id)===String(id));
-  if(!o) return;
-  const history=[...(o.history||[]),{event:`Cambio a ${status}`,at:new Date().toLocaleString("es-MX")}];
-  const patch={status,history};
-  if(status==="pagado") patch.paid_at=new Date().toISOString();
-  if(status==="entregado") patch.delivered_at=new Date().toISOString();
-  if(status==="no_entregado") patch.not_delivered_at=new Date().toISOString();
-
-  if(supabaseOK && !String(id).startsWith("local")){
-    const {error}=await db.from("cero_grados_orders").update(patch).eq("id",id);
-    if(error){
-      console.error(error);
-      alert("No se pudo actualizar en Supabase. Se actualizará local.");
-    }
-  }
-
   const local=localOrders();
-  const localIndex=local.findIndex(x=>String(x.id)===String(id));
-  if(localIndex>=0){
-    local[localIndex]={...local[localIndex],...patch};
+  const idx=local.findIndex(x=>String(x.id)===String(id));
+  if(idx>=0){
+    const o=local[idx];
+    const history=[...(o.history||[]),{event:`Cambio a ${status}`,at:new Date().toLocaleString("es-MX")}];
+    const patch={status,history};
+    if(status==="entregado") patch.delivered_at=new Date().toISOString();
+    if(status==="no_entregado") patch.not_delivered_at=new Date().toISOString();
+    local[idx]={...o,...patch};
     saveLocalOrders(local);
-  } else if(!supabaseOK) {
-    const idx=orders.findIndex(x=>String(x.id)===String(id));
-    if(idx>=0){
-      orders[idx]={...orders[idx],...patch};
-      saveLocalOrders(orders);
-    }
   }
-
-  await loadOrders();
-  if(status==="pagado") view("entregas");
+  orders=localOrders();
+  renderAll();
 }
 
 function codes(id){
@@ -541,43 +498,10 @@ function printOrderTicket(order){
   box.style.display="block";
   box.innerHTML=buildTicketHTML(order);
   window.print();
-  setTimeout(()=>{box.style.display="none";},500);
-}
-
-function printExistingTicket(id){
-  const o=orders.find(x=>String(x.id)===String(id));
-  if(o) printOrderTicket(o);
-}
-
-function exportCSV(){
-  const topNames=TOPPINGS.map(t=>t.name);
-  const mochiNames=MOCHIS.map(m=>m.name);
-  const headers=["ID","Cliente","Estado","Total","Tipo","Sabor","Bolas",...topNames.map(n=>"Topping "+n),...mochiNames.map(n=>"Mochi "+n)];
-  const rows=orders.map(o=>{
-    const tc={};[...(o.included||[]),...(o.extras||[])].forEach(t=>tc[t.name]=(tc[t.name]||0)+1);
-    const mc={};(o.mochis||[]).forEach(m=>mc[m.name]=m.qty);
-    return [o.id,o.customer,o.status,o.total,o.product_type,o.flavor?.name,o.scoops,...topNames.map(n=>tc[n]||0),...mochiNames.map(n=>mc[n]||0)];
-  });
-  const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="historial_cero_grados_detallado.csv";
-  a.click();
-}
-
-function renderAll(){renderFlavors();renderMochis();renderToppingFilters();renderToppings();renderSummary();renderCashier();renderDeliveries();renderHistory();}
-setType("helado");
-setTimeout(()=>{
-  const txt=document.getElementById("status").textContent;
-  if(txt==="Conectando..." || txt==="Cargando..."){
-    supabaseOK=false;
-    orders=localOrders();
-    statusText("Modo local",false);
-    renderAll();
-  }
-},3500);
-loadOrders();
+  supabaseOK=false;
+orders=localOrders();
+statusText("Modo local",false);
+renderAll();
 </script>
 </body>
 </html>
