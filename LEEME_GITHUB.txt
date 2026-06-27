@@ -1,18 +1,9 @@
-Cero Grados POS v22
+Cero Grados POS v23
 
-Esta versión funciona aunque Supabase falle:
-- Si Supabase conecta: guarda en Supabase.
-- Si Supabase marca error: guarda local en la computadora y permite imprimir ticket.
-
-Flujo:
-1. Captura pedido.
-2. Imprime ticket.
-3. Cliente paga en Caja.
-4. Regresa con ticket.
-5. Cero Grados marca Entregado.
+Corrección:
+- Si Supabase tarda o falla, en 3 segundos cambia a Modo local.
+- Ya no se queda atorado en "Conectando...".
+- Permite capturar pedido e imprimir ticket aunque Supabase falle.
 
 Abrir con:
-?v=22
-
-Si quieres usar Supabase:
-Ejecuta supabase_schema.sql en Supabase.
+?v=23

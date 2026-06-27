@@ -95,7 +95,7 @@ input,textarea{width:100%;padding:13px;border:1px solid var(--line);border-radiu
     <button class="navbtn" onclick="view('historial')">📋 Historial</button>
     <div class="userbox">
       <b>Cero Grados 0°</b><br>
-      <small>POS v22 · Ticket local/Supabase</small>
+      <small>POS v23 · Modo local rápido</small>
     </div>
   </aside>
 
@@ -216,17 +216,30 @@ function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",c
 function statusText(t, ok=true){const s=document.getElementById("status");s.textContent=t;s.style.color=ok?"#15803d":"#b91c1c"}
 
 async function loadOrders(){
-  const {data,error}=await db.from("cero_grados_orders").select("*").order("created_at",{ascending:false});
-  if(error){
-    console.error("Supabase error:", error);
+  statusText("Cargando...", false);
+
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Tiempo agotado Supabase")), 3000)
+  );
+
+  const queryPromise = db
+    .from("cero_grados_orders")
+    .select("*")
+    .order("created_at", {ascending:false});
+
+  try{
+    const result = await Promise.race([queryPromise, timeoutPromise]);
+    if(result.error) throw result.error;
+    supabaseOK=true;
+    orders=result.data||[];
+    statusText("Conectado",true);
+  }catch(e){
+    console.warn("Usando modo local:", e);
     supabaseOK=false;
     orders=localOrders();
     statusText("Modo local",false);
-  } else {
-    supabaseOK=true;
-    orders=data||[];
-    statusText("Conectado",true);
   }
+
   renderAll();
 }
 try{
@@ -555,6 +568,15 @@ function exportCSV(){
 
 function renderAll(){renderFlavors();renderMochis();renderToppingFilters();renderToppings();renderSummary();renderCashier();renderDeliveries();renderHistory();}
 setType("helado");
+setTimeout(()=>{
+  const txt=document.getElementById("status").textContent;
+  if(txt==="Conectando..." || txt==="Cargando..."){
+    supabaseOK=false;
+    orders=localOrders();
+    statusText("Modo local",false);
+    renderAll();
+  }
+},3500);
 loadOrders();
 </script>
 </body>
