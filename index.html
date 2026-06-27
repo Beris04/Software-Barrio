@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cero Grados v30</title>
+<title>Cero Grados v31</title>
 <style>
 :root{--bg:#f7efec;--card:#fffaf8;--ink:#271816;--muted:#725753;--line:#eadbd7;--brand:#873f38;--blue:#2563eb;--green:#15803d;--red:#b91c1c;--gray:#64748b;--orange:#ea580c}
 *{box-sizing:border-box}
@@ -22,16 +22,16 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:
 h1,h2,h3{margin:0 0 12px}
 label{display:block;font-weight:900;margin:10px 0 6px}
 input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:16px;background:white}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.cardbtn{background:white;border:2px solid var(--line);border-radius:20px;min-height:95px;padding:14px;font-size:18px;font-weight:950;cursor:pointer;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:stretch}
+.cardbtn{background:white;border:2px solid var(--line);border-radius:20px;min-height:118px;padding:16px;font-size:18px;font-weight:950;cursor:pointer;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;line-height:1.2}
 .cardbtn.active{border-color:var(--blue);background:#eef6ff;color:#0b5ec8}
 .icon{font-size:34px}
 .slots{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px}
-.slot,.flavor{background:white;border:2px solid var(--line);border-radius:18px;padding:14px;font-weight:950;cursor:pointer;text-align:center}
+.slot,.flavor{background:white;border:2px solid var(--line);border-radius:18px;padding:14px;font-weight:950;cursor:pointer;text-align:center;min-height:58px;display:flex;align-items:center;justify-content:center}
 .slot.active,.flavor.active{border-color:var(--brand);background:#fff1f2}
 .flavors{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .filters{display:flex;gap:8px;overflow:auto;margin-bottom:12px;padding-bottom:4px}
-.filter{border:0;background:white;border-radius:999px;padding:11px 15px;font-weight:950;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.filter{border:0;background:white;border-radius:999px;padding:11px 18px;font-weight:950;cursor:pointer;white-space:nowrap;color:var(--ink);min-width:92px}
 .filter.active{background:var(--brand);color:white}
 .products{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .product{background:white;border:1px solid var(--line);border-radius:18px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
@@ -75,7 +75,7 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 <button class="nav active" onclick="view('nuevo')">➕ Nuevo pedido</button>
 <button class="nav" onclick="view('entregas')">🧾 Tickets / Entregas <span class="badge" id="entregaCount">0</span></button>
 <button class="nav" onclick="view('historial')">📋 Historial</button>
-<div style="position:absolute;bottom:18px;left:18px;right:18px;color:#dbeafe;border-top:1px solid rgba(255,255,255,.18);padding-top:12px"><b>Cero Grados 0°</b><br><small>v30 estable local</small></div>
+<div style="position:absolute;bottom:18px;left:18px;right:18px;color:#dbeafe;border-top:1px solid rgba(255,255,255,.18);padding-top:12px"><b>Cero Grados 0°</b><br><small>v31 estética local</small></div>
 </aside>
 <main class="main">
 <section id="viewNuevo" class="grid">
@@ -102,8 +102,10 @@ input,textarea{width:100%;border:1px solid var(--line);border-radius:14px;paddin
 <div id="toppings" class="products"></div>
 </div>
 
+<div id="mochiBlock" style="display:none">
 <h2 style="margin-top:18px">Mochis</h2>
 <div id="mochis" class="products"></div>
+</div>
 <label>Observaciones</label><textarea id="notes" rows="2"></textarea>
 </div>
 <aside class="panel summary">
@@ -149,7 +151,14 @@ function view(v){
  document.getElementById("viewHistorial").style.display=v==="historial"?"block":"none";
  renderAll();
 }
-function setType(t){current.type=t;document.getElementById("typeHelado").classList.toggle("active",t==="helado");document.getElementById("typeMochi").classList.toggle("active",t==="mochi");document.getElementById("heladoBlock").style.display=t==="helado"?"block":"none";renderAll()}
+function setType(t){
+ current.type=t;
+ document.getElementById("typeHelado").classList.toggle("active",t==="helado");
+ document.getElementById("typeMochi").classList.toggle("active",t==="mochi");
+ document.getElementById("heladoBlock").style.display=t==="helado"?"block":"none";
+ document.getElementById("mochiBlock").style.display=t==="mochi"?"block":"none";
+ renderAll();
+}
 function setScoops(n){current.scoops=n;if(n===1)current.activeFlavor=0;document.getElementById("size1").classList.toggle("active",n===1);document.getElementById("size2").classList.toggle("active",n===2);renderAll()}
 function qty(obj,key,d){obj[key]=Math.max(0,(obj[key]||0)+d);if(obj[key]===0)delete obj[key];renderAll()}
 function setFilter(g){filterGroup=g;renderFilters();renderToppings()}

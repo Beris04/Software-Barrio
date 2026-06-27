@@ -1,4 +1,10 @@
-Cero Grados v30 estable local.
-Sube la carpeta descomprimida a GitHub Desktop y abre con ?v=30.
-No usa Supabase.
-Toppings visibles y funcionales.
+Cero Grados v31 estética local.
+
+Cambios:
+- Botones más simétricos.
+- Mochis solo aparecen al seleccionar Solo Mochis.
+- Tapioca tiene filtro propio junto a Orion.
+- Sigue en modo local: el historial solo se ve en la computadora donde se capturó.
+
+Abrir con:
+?v=31
