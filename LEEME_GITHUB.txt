@@ -1,11 +1,10 @@
-Cero Grados POS v61
+Cero Grados POS v62
 
-Correcciones visuales:
-- Logo corregido con respaldo de texto si no carga.
-- Se eliminaron emojis duplicados.
-- Botones más limpios.
-- Resumen e impresión más claros.
-- Mantiene la funcionalidad de v60.
+Correcciones:
+- El pedido se registra en Tickets / Entregas aunque falle la impresión.
+- Nuevo botón: Confirmar pedido sin imprimir.
+- Guarda primero respaldo local.
+- Entregas muestra pedidos locales y de Supabase.
 
 Abrir con:
-?v=61
+?v=62

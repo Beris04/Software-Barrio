@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Cero Grados POS v61</title>
+<title>Cero Grados POS v62</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
@@ -85,22 +85,23 @@ textarea{border:1px solid var(--line);border-radius:16px;background:white;paddin
 .modalBox{background:white;border-radius:24px;padding:20px;width:100%;max-width:860px;max-height:86vh;overflow:auto}
 @media print{body *{visibility:hidden!important}#printTicket,#printTicket *{visibility:visible!important}#printTicket{display:block!important;position:absolute;left:0;top:0;width:80mm;background:white;color:black;padding:5mm;font-family:Arial,sans-serif}}
 @media(max-width:1180px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:relative}.sideFoot{position:relative;left:auto;right:auto;bottom:auto;margin-top:18px}.layout{grid-template-columns:1fr}.summary{height:auto;position:relative}.work{height:auto}.chips{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:repeat(3,1fr)}.products,.orders2,.orders3{grid-template-columns:1fr}}
+.confirm{background:linear-gradient(135deg,#159447,#0f7a39)!important;box-shadow:0 15px 32px rgba(21,148,71,.22)!important}
 </style>
 
-<style id="v61-modern-override">
+<style id="v62-modern-override">
 :root{
-  --v61-bg:#fff7f3;
-  --v61-card:#fffdfb;
-  --v61-line:#edd8d2;
-  --v61-brand:#913631;
-  --v61-brand2:#b5453f;
-  --v61-dark:#120b14;
-  --v61-ink:#211415;
-  --v61-muted:#7b615c;
+  --v62-bg:#fff7f3;
+  --v62-card:#fffdfb;
+  --v62-line:#edd8d2;
+  --v62-brand:#913631;
+  --v62-brand2:#b5453f;
+  --v62-dark:#120b14;
+  --v62-ink:#211415;
+  --v62-muted:#7b615c;
 }
 body{
   background:radial-gradient(circle at top left,#fff 0,#fff8f5 45%,#f4e4dd 100%)!important;
-  color:var(--v61-ink)!important;
+  color:var(--v62-ink)!important;
 }
 .sidebar{
   background:linear-gradient(180deg,#160b13 0%,#07111f 100%)!important;
@@ -157,13 +158,13 @@ input,textarea{
   gap:22px!important;
   text-align:center!important;
   background:linear-gradient(135deg,#fff,#fff7f4)!important;
-  border:2px solid var(--v61-line)!important;
+  border:2px solid var(--v62-line)!important;
   box-shadow:0 10px 24px rgba(145,54,49,.06)!important;
 }
 .cardbtn.active,.bigCard.active,.choice.active,.flavor.active,.sizeCard.active,.slot.active,.filter.active{
   background:linear-gradient(135deg,#fff7f5,#fff0ed)!important;
-  border-color:var(--v61-brand)!important;
-  color:var(--v61-brand)!important;
+  border-color:var(--v62-brand)!important;
+  color:var(--v62-brand)!important;
 }
 .icon,.bigIcon,.sicon{
   font-size:48px!important;
@@ -209,13 +210,13 @@ input,textarea{
   background:white!important;
   padding:15px!important;
   min-height:82px!important;
-  border:1px solid var(--v61-line)!important;
+  border:1px solid var(--v62-line)!important;
 }
 .qbtn,.qtyBtn{
   width:42px!important;
   height:42px!important;
   border-radius:15px!important;
-  background:var(--v61-brand)!important;
+  background:var(--v62-brand)!important;
 }
 .minus,.qbtn.minus,.qtyBtn.minus{
   background:#64748b!important;
@@ -233,7 +234,7 @@ input,textarea{
   border-radius:18px!important;
 }
 .total{
-  color:var(--v61-brand)!important;
+  color:var(--v62-brand)!important;
   font-size:40px!important;
 }
 .order,.orderCard{
@@ -249,7 +250,7 @@ input,textarea{
 </style>
 
 
-<style id="v61-cleanup">
+<style id="v62-cleanup">
 .logoBox,.logoCard{
   min-height:112px!important;
   display:flex!important;
@@ -287,7 +288,7 @@ h1::before,h2::before{content:none!important}
   content:"🧾"!important;
 }
 #typeHelado .icon::after,#btnHelado .heroIcon::after{content:none!important}
-#v61-badge{display:none!important}
+#v62-badge{display:none!important}
 </style>
 
 </head>
@@ -300,7 +301,7 @@ h1::before,h2::before{content:none!important}
     <button class="nav" onclick="view('historial')">📋 Historial</button>
     <div class="sideFoot">
       <b>Cero Grados 0°</b><br>
-      <small>v61 · POS limpio</small><br>
+      <small>v62 · Confirmar pedido</small><br>
       <small><span id="dot" class="syncDot"></span><span id="syncStatus">Conectando...</span></small>
     </div>
   </aside>
@@ -348,7 +349,8 @@ h1::before,h2::before{content:none!important}
         <h2>Resumen del pedido</h2>
         <div id="summary"></div>
         <div class="totalRow"><b>TOTAL</b><div class="total" id="total">$0.00</div></div>
-        <button class="primary" onclick="sendOrder()">Imprimir ticket</button>
+        <button class="primary" onclick="sendOrder(true)">Imprimir ticket</button>
+          <button class="primary confirm" onclick="sendOrder(false)">Confirmar pedido sin imprimir</button>
         <button class="secondary" onclick="clearOrder()">Limpiar pedido</button>
         <div class="notice"><div style="font-size:25px">💡</div><div>Imprime el ticket y entrégalo al cliente. El pago se realiza en caja física.</div></div>
       </aside>
@@ -383,25 +385,49 @@ let orders=[], supabaseOK=false, filterGroup="Todos";
 let current={type:"helado",scoops:1,activeFlavor:0,flavors:[FLAVORS[0].id,FLAVORS[0].id],toppings:{},mochis:{}};
 
 function money(n){return Number(n||0).toLocaleString("es-MX",{style:"currency",currency:"MXN"})}
-function localOrders(){return JSON.parse(localStorage.getItem("cero_v61_local")||"[]")}
-function saveLocal(data){localStorage.setItem("cero_v61_local",JSON.stringify(data))}
+function localOrders(){return JSON.parse(localStorage.getItem("cero_v62_local")||"[]")}
+function saveLocal(data){localStorage.setItem("cero_v62_local",JSON.stringify(data))}
 function setSync(text,ok=false){document.getElementById("syncStatus").textContent=text;document.getElementById("dot").style.background=ok?"#22c55e":"#f87171"}
 function showDbMessage(html){const el=document.getElementById("dbMessage");if(el){el.style.display="block";el.innerHTML=html}}
 function hideDbMessage(){const el=document.getElementById("dbMessage");if(el)el.style.display="none"}
 
 async function loadOrders(){
-  if(!db){supabaseOK=false;orders=localOrders();setSync("Modo local",false);renderAll();return}
-  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("Tiempo agotado")),3500));
-  try{
-    const result=await Promise.race([db.from("cero_grados_orders").select("*").order("created_at",{ascending:false}),timeout]);
-    if(result.error) throw result.error;
-    supabaseOK=true;orders=result.data||[];setSync("Conectado",true);hideDbMessage();
-  }catch(e){
-    console.warn(e);supabaseOK=false;orders=localOrders();setSync("Modo local respaldo",false);
+  const local=localOrders();
+
+  if(!db){
+    orders=local;
+    setSync("Modo local",false);
+    renderAll();
+    return;
   }
+
+  const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error("Tiempo agotado")),3500));
+
+  try{
+    const result=await Promise.race([
+      db.from("cero_grados_orders").select("*").order("created_at",{ascending:false}),
+      timeout
+    ]);
+    if(result.error)throw result.error;
+
+    supabaseOK=true;
+    const remote=result.data||[];
+    const map=new Map();
+    [...local,...remote].forEach(o=>map.set(String(o.id),o));
+    orders=Array.from(map.values()).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+
+    setSync("Conectado",true);
+    if(typeof hideMsg==="function") hideMsg();
+  }catch(e){
+    console.warn(e);
+    supabaseOK=false;
+    orders=local;
+    setSync("Modo local respaldo",false);
+  }
+
   renderAll();
 }
-if(db){try{db.channel("v61_live").on("postgres_changes",{event:"*",schema:"public",table:"cero_grados_orders"},()=>loadOrders()).subscribe();}catch(e){console.warn(e)}}
+if(db){try{db.channel("v62_live").on("postgres_changes",{event:"*",schema:"public",table:"cero_grados_orders"},()=>loadOrders()).subscribe();}catch(e){console.warn(e)}}
 
 function view(v){
   document.querySelectorAll(".nav").forEach(b=>b.classList.remove("active"));
@@ -473,16 +499,64 @@ function clearOrder(){
   current={type:"helado",scoops:1,activeFlavor:0,flavors:[FLAVORS[0].id,FLAVORS[0].id],toppings:{},mochis:{}};
   document.getElementById("customer").value="";document.getElementById("notes").value="";setType("helado");setScoops(1);
 }
-async function sendOrder(){
+async function sendOrder(shouldPrint=true){
   const customer=document.getElementById("customer").value.trim(), c=calc();
-  if(!customer)return alert("Captura nombre o mesa"); if(c.total<=0)return alert("Agrega un producto");
-  const order={created_at:new Date().toISOString(),customer,notes:document.getElementById("notes").value,type:current.type,product_type:current.type,scoops:current.type==="helado"?current.scoops:0,flavor:c.flavor,base:c.base,included:c.included,extras:c.extras,mochis:c.mochiItems,total:c.total,status:"ticket_impreso",history:[{event:"Ticket impreso",at:new Date().toLocaleString("es-MX")}]};
+  if(!customer)return alert("Captura nombre o mesa");
+  if(c.total<=0)return alert("Agrega un producto");
+
+  const order={
+    created_at:new Date().toISOString(),
+    customer,
+    notes:document.getElementById("notes").value,
+    type:current.type,
+    product_type:current.type,
+    scoops:current.type==="helado"?current.scoops:0,
+    flavor:c.flavor,
+    base:c.base,
+    included:c.included,
+    extras:c.extras,
+    mochis:c.mochiItems,
+    total:c.total,
+    status:"ticket_impreso",
+    history:[{event:shouldPrint?"Ticket impreso":"Pedido confirmado sin imprimir",at:new Date().toLocaleString("es-MX")}]
+  };
+
   let saved={...order,id:"local_"+Date.now()};
+
+  // Guardar primero local para que SIEMPRE aparezca en Tickets / Entregas.
+  const local=localOrders();
+  local.unshift(saved);
+  saveLocal(local);
+
+  // Intentar Supabase después, sin bloquear operación.
   if(supabaseOK&&db){
-    const {data,error}=await db.from("cero_grados_orders").insert(order).select().single();
-    if(error){console.error(error);const local=localOrders();local.unshift(saved);saveLocal(local);setSync("Modo local respaldo",false)}else saved=data;
-  }else{const local=localOrders();local.unshift(saved);saveLocal(local)}
-  printTicket(saved);clearOrder();await loadOrders();view("entregas");
+    try{
+      const {data,error}=await db.from("cero_grados_orders").insert(order).select().single();
+      if(!error&&data){
+        saved=data;
+      }else if(error){
+        console.warn("No guardó en Supabase:", error);
+        setSync("Modo local respaldo",false);
+      }
+    }catch(e){
+      console.warn("No guardó en Supabase:", e);
+      setSync("Modo local respaldo",false);
+    }
+  }
+
+  if(shouldPrint){
+    try{
+      printTicket(saved);
+    }catch(e){
+      console.warn("Error al imprimir:", e);
+      alert("El pedido sí se guardó en Entregas, pero no se pudo abrir la impresión.");
+    }
+  }
+
+  clearOrder();
+  await loadOrders();
+  if(typeof showScreen==="function") showScreen("delivery");
+  else if(typeof view==="function") view("entregas");
 }
 function ticketHTML(o){
   const rows=[];if(o.scoops>0)rows.push(`<div><b>${o.scoops} bola(s)</b> ${o.flavor.name} <span>${money(o.base)}</span></div>`);
@@ -514,10 +588,10 @@ function detail(id){const o=orders.find(x=>String(x.id)===String(id));document.g
 function closeDetail(){document.getElementById("detailModal").classList.remove("show")}
 async function testSupabase(){try{const {data,error}=await db.from("cero_grados_orders").select("id").limit(3);if(error)throw error;showDbMessage("<b style='color:#159447'>Supabase conectado.</b> Registros: "+(data?.length||0));setSync("Conectado",true)}catch(e){showDbMessage("<b style='color:#bf2323'>No conecta con Supabase.</b><br>"+(e.message||e));setSync("Modo local respaldo",false)}}
 function exportCSV(){const headers=["ID","Cliente","Estado","Total","Tipo","Sabor","Bolas"];const rows=orders.map(o=>[o.id,o.customer,o.status,o.total,o.type,o.flavor?.name,o.scoops]);const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\\n");const blob=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="historial_cero_grados.csv";a.click()}
-function clearLocal(){if(confirm("¿Borrar respaldo local?")){localStorage.removeItem("cero_v61_local");loadOrders()}}
+function clearLocal(){if(confirm("¿Borrar respaldo local?")){localStorage.removeItem("cero_v62_local");loadOrders()}}
 function renderAll(){renderFlavors();renderMochis();renderFilters();renderToppings();renderSummary();renderDeliveries();renderHistory()}
 setType("helado");loadOrders();
 </script>
-<div id="v61-badge" style="position:fixed;right:12px;bottom:10px;background:#dcfce7;color:#166534;border-radius:10px;padding:7px 12px;font:700 12px Arial;z-index:9999">v61 · POS limpio</div>
+<div id="v62-badge" style="position:fixed;right:12px;bottom:10px;background:#dcfce7;color:#166534;border-radius:10px;padding:7px 12px;font:700 12px Arial;z-index:9999">v62 · Confirmar pedido</div>
 </body>
 </html>
