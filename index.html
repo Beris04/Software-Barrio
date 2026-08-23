@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cero Grados Simple v73 Reparada</title>
+<title>Cero Grados Simple v74 Corregida</title>
 <style>
 :root{--bg:#f6f1ef;--card:#fff;--ink:#241817;--muted:#77615d;--line:#e6d9d5;--brand:#8d3a34;--soft:#f8e9e6;--green:#13804a;--blue:#245bc4;--gray:#64748b}
 *{box-sizing:border-box}
@@ -64,7 +64,7 @@ h1{margin:14px 0}h2{margin:20px 0 10px}.segRow{display:grid;grid-template-column
 </div>
 <h2>Sabor bola 1</h2><div class="flavors" id="flavor1"></div>
 <div id="f2block" style="display:none"><h2>Sabor bola 2</h2><div class="flavors" id="flavor2"></div></div>
-<h2>Toppings <span style="font-size:13px;color:#77615d;font-weight:700">(50 disponibles · v73)</span></h2><div class="filters" id="filters"></div><div class="products" id="toppings"></div>
+<h2>Toppings <span style="font-size:13px;color:#77615d;font-weight:700">(50 disponibles · v74)</span></h2><div class="filters" id="filters"></div><div class="products" id="toppings"></div>
 </div>
 
 <div id="mochiBlock" style="display:none"><h2>Mochis</h2><div class="products" id="mochis"></div></div>
@@ -120,20 +120,32 @@ function hideError(){
  if(e)e.style.display="none";
 }
 async function testConnection(){
+ if(!db){
+   setStatus("Error: librería Supabase",false);
+   showError("No cargó la librería supabase-js.");
+   return;
+ }
  try{
-   await api("/cero_grados_orders?select=id&limit=1");
+   const {data,error}=await db.from("cero_grados_orders").select("id").limit(1);
+   if(error) throw error;
    setStatus("Supabase conectado",true);
    hideError();
    alert("Conexión correcta con Supabase.");
  }catch(e){
+   console.error(e);
    setStatus("Error Supabase",false);
    showError(e.message||String(e));
  }
 }
 async function loadOrders(){
- if(!db){setStatus("Error: librería Supabase",false);renderCash();return;}
+ if(!db){
+   setStatus("Error: librería Supabase",false);
+   renderCash();
+   return;
+ }
  try{
-   const data=await api("/cero_grados_orders?select=*&order=created_at.desc");
+   const {data,error}=await db.from("cero_grados_orders").select("*").order("created_at",{ascending:false});
+   if(error) throw error;
    orders=data||[];
    setStatus("Supabase conectado",true);
    hideError();
@@ -237,11 +249,8 @@ async function saveOrder(){
    history:[{event:"Pedido creado",at:new Date().toLocaleString("es-MX")}]
  };
  try{
-   await api("/cero_grados_orders",{
-     method:"POST",
-     headers:{"Prefer":"return=minimal"},
-     body:JSON.stringify(row)
-   });
+   const {error}=await db.from("cero_grados_orders").insert(row);
+   if(error) throw error;
    setStatus("Supabase conectado",true);
    hideError();
    alert("Pedido enviado a Caja");
