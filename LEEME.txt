@@ -1,10 +1,17 @@
-Cero Grados Simple v70
+Cero Grados Simple v71
 
-1. Ejecuta supabase_schema.sql en Supabase.
-2. Sube la carpeta descomprimida a GitHub Desktop.
-3. Abre con ?v=70.
-4. En la tablet de tienda entra a Pedidos.
-5. En la computadora/tablet de caja entra a Caja.
-6. Caja actualiza automáticamente cada 3 segundos.
+IMPORTANTE:
+1. Ve a Supabase > SQL Editor.
+2. Ejecuta TODO el archivo supabase_schema.sql.
+3. Espera a que indique Success.
+4. Sube esta carpeta por GitHub Desktop.
+5. Abre tu página con ?v=71.
+6. En Caja pulsa "Probar Supabase".
 
-No hay usuario ni contraseña.
+Esta versión ya NO usa la librería supabase-js para las consultas.
+Usa directamente la REST API de Supabase y muestra el error exacto en pantalla.
+
+En dos dispositivos:
+- Tablet 1 > Pedidos.
+- Tablet/PC 2 > Caja.
+- Caja actualiza automáticamente cada 3 segundos.
