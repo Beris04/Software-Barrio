@@ -1,14 +1,14 @@
-Cero Grados Simple v73 Reparada
+Cero Grados v80 - Pedidos + Caja
 
-CORRECCIÓN REAL:
-- La v72 tenía 50 toppings, pero faltaba cargar la librería supabase-js.
-- Eso detenía todo el JavaScript y por eso no aparecían sabores, toppings ni mochis.
-- v73 vuelve a cargar la librería y valida que exista antes de conectarse.
-- JavaScript validado con Node: sin errores de sintaxis.
+1. Ejecuta supabase_schema.sql en Supabase.
+2. Sube index.html y .nojekyll al repositorio.
+3. Abre GitHub Pages con ?v=80.
+4. Tablet 1: Pedidos.
+5. Dispositivo 2: Caja.
+6. Caja se actualiza cada 3 segundos.
 
-Sube los archivos a la raíz del repositorio Software-Barrio.
-Después abre:
-https://beris04.github.io/Software-Barrio/?v=73
-
-En Pedidos debe aparecer:
-50 disponibles · v73
+La app usa:
+- Project URL de Supabase
+- sb_publishable_... (publishable key)
+- REST API directa
+No usa service_role ni secret keys.
