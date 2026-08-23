@@ -1,17 +1,17 @@
-Cero Grados Simple v71
+Cero Grados Simple v72
 
-IMPORTANTE:
-1. Ve a Supabase > SQL Editor.
-2. Ejecuta TODO el archivo supabase_schema.sql.
-3. Espera a que indique Success.
-4. Sube esta carpeta por GitHub Desktop.
-5. Abre tu página con ?v=71.
-6. En Caja pulsa "Probar Supabase".
+CORRECCIÓN:
+- Pedidos incluye el catálogo completo: 50 toppings.
+- Tapioca tiene su propio botón.
+- Mochis completos a $55.
+- Solo hay dos accesos: Pedidos y Caja.
+- Los dos dispositivos usan la misma tabla de Supabase.
+- Caja consulta nuevos pedidos automáticamente cada 3 segundos.
 
-Esta versión ya NO usa la librería supabase-js para las consultas.
-Usa directamente la REST API de Supabase y muestra el error exacto en pantalla.
-
-En dos dispositivos:
-- Tablet 1 > Pedidos.
-- Tablet/PC 2 > Caja.
-- Caja actualiza automáticamente cada 3 segundos.
+PASOS:
+1. Ejecuta supabase_schema.sql en Supabase.
+2. Sube esta carpeta descomprimida a GitHub Desktop.
+3. Abre:
+   ?v=72
+4. En Pedidos debe decir: "50 disponibles".
+5. En Caja pulsa "Probar Supabase" para validar la conexión.
