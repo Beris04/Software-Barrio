@@ -1,0 +1,10 @@
+Cero Grados Simple v70
+
+1. Ejecuta supabase_schema.sql en Supabase.
+2. Sube la carpeta descomprimida a GitHub Desktop.
+3. Abre con ?v=70.
+4. En la tablet de tienda entra a Pedidos.
+5. En la computadora/tablet de caja entra a Caja.
+6. Caja actualiza automáticamente cada 3 segundos.
+
+No hay usuario ni contraseña.
