@@ -1,17 +1,14 @@
-Cero Grados Simple v72
+Cero Grados Simple v73 Reparada
 
-CORRECCIÓN:
-- Pedidos incluye el catálogo completo: 50 toppings.
-- Tapioca tiene su propio botón.
-- Mochis completos a $55.
-- Solo hay dos accesos: Pedidos y Caja.
-- Los dos dispositivos usan la misma tabla de Supabase.
-- Caja consulta nuevos pedidos automáticamente cada 3 segundos.
+CORRECCIÓN REAL:
+- La v72 tenía 50 toppings, pero faltaba cargar la librería supabase-js.
+- Eso detenía todo el JavaScript y por eso no aparecían sabores, toppings ni mochis.
+- v73 vuelve a cargar la librería y valida que exista antes de conectarse.
+- JavaScript validado con Node: sin errores de sintaxis.
 
-PASOS:
-1. Ejecuta supabase_schema.sql en Supabase.
-2. Sube esta carpeta descomprimida a GitHub Desktop.
-3. Abre:
-   ?v=72
-4. En Pedidos debe decir: "50 disponibles".
-5. En Caja pulsa "Probar Supabase" para validar la conexión.
+Sube los archivos a la raíz del repositorio Software-Barrio.
+Después abre:
+https://beris04.github.io/Software-Barrio/?v=73
+
+En Pedidos debe aparecer:
+50 disponibles · v73
