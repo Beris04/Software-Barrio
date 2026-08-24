@@ -1,17 +1,14 @@
-Go hōbi POS v90
+Go hōbi POS v91
 
-Diseño aplicado con identidad Go hōbi:
-- Linen White #F6EDE9
-- Toast Brown #9B6C66
-- Burnt Brown #A7624C
-- Espresso #7B3B34
-- Tobacco #3B2B29
-- Blush Brown #C39A94
+Correcciones funcionales:
+- Selección de sabores Bola 1.
+- Selección de sabores Bola 2.
+- Botones + / - de toppings.
+- Botones + / - de mochis.
+- Filtros de toppings.
+- Mejor soporte táctil para tablet.
 
-Mantiene:
-- Pantalla inicial Pedidos / Caja
-- Catálogo y lógica
-- Conexión Supabase de la versión anterior
+No se cambió el diseño aprobado.
 
 Abrir con:
-?v=90
+?v=91

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Go hōbi POS v90</title>
+<title>Go hōbi POS v91</title>
 <style>
 :root{
  --bg:#f7f9fb;--card:#fff;--ink:#0f1720;--muted:#667085;--line:#e5e7eb;
@@ -147,7 +147,7 @@ textarea{resize:vertical}
 
 </style>
 
-<style id="gohobi-v90-theme">
+<style id="gohobi-v91-theme">
 :root{
  --linen:#F6EDE9;--toast:#9B6C66;--burnt:#A7624C;--espresso:#7B3B34;
  --tobacco:#3B2B29;--blush:#C39A94;--cream:#FFF9F6;--green:#4FA35D;
@@ -198,6 +198,38 @@ h1,h2,h3,.sectionTitle{color:var(--tobacco)!important}
 input,textarea{border-color:var(--line)!important;background:#fffdfb!important;color:var(--tobacco)!important}
 input:focus,textarea:focus{outline:2px solid rgba(155,108,102,.22)!important;border-color:var(--toast)!important}
 @media(max-width:1050px){.startScreen{background:var(--linen)!important}}
+</style>
+
+
+<style id="v91-click-fix">
+.flavor,.filter,.product,.qty button,.choiceCard,.sizeCard,.startChoice,.navBtn,
+button,[onclick]{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  position:relative;
+  z-index:2;
+}
+#flavor1,#flavor2,#toppings,#mochis,.filters{
+  position:relative;
+  z-index:3;
+}
+.summaryPanel{
+  z-index:1!important;
+}
+.product .qty{
+  position:relative;
+  z-index:5;
+}
+.product .qty button{
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-user-select:none;
+}
+.flavor{
+  touch-action:manipulation;
+  user-select:none;
+  -webkit-user-select:none;
+}
 </style>
 
 </head>
@@ -412,29 +444,101 @@ function setFilter(g){filter=g;renderFilters();renderToppings()}
 function qty(obj,key,d){obj[key]=Math.max(0,(obj[key]||0)+d);if(obj[key]===0)delete obj[key];render()}
 
 function renderFlavors(){
-  document.getElementById("flavor1").innerHTML=FLAVORS.map(f=>`<div class="flavor ${current.f1===f.id?'active':''}" onclick="current.f1='${f.id}';render()">${f.name}</div>`).join("");
-  document.getElementById("flavor2").innerHTML=FLAVORS.map(f=>`<div class="flavor ${current.f2===f.id?'active':''}" onclick="current.f2='${f.id}';render()">${f.name}</div>`).join("");
+  const f1box=document.getElementById("flavor1");
+  const f2box=document.getElementById("flavor2");
+
+  f1box.innerHTML=FLAVORS.map(f=>
+    `<button type="button" class="flavor ${current.f1===f.id?'active':''}" data-flavor1="${f.id}">${f.name}</button>`
+  ).join("");
+
+  f2box.innerHTML=FLAVORS.map(f=>
+    `<button type="button" class="flavor ${current.f2===f.id?'active':''}" data-flavor2="${f.id}">${f.name}</button>`
+  ).join("");
+
+  f1box.querySelectorAll("[data-flavor1]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      current.f1=btn.dataset.flavor1;
+      render();
+    });
+  });
+
+  f2box.querySelectorAll("[data-flavor2]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      current.f2=btn.dataset.flavor2;
+      render();
+    });
+  });
 }
 function renderFilters(){
-  const groups=["Todos","Gomitas","Pocky","Galletas","KitKat","Orion","Tapioca"].filter(g=>g==="Todos"||TOPPINGS.some(t=>t.group===g));
-  document.getElementById("filters").innerHTML=groups.map(g=>`<button class="filter ${filter===g?'active':''}" onclick="setFilter('${g}')">${g}</button>`).join("");
+  const groups=["Todos","Gomitas","Pocky","Galletas","KitKat","Orion","Tapioca"]
+    .filter(g=>g==="Todos"||TOPPINGS.some(t=>t.group===g));
+
+  const box=document.getElementById("filters");
+  box.innerHTML=groups.map(g=>
+    `<button type="button" class="filter ${filter===g?'active':''}" data-filter="${g}">${g}</button>`
+  ).join("");
+
+  box.querySelectorAll("[data-filter]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      setFilter(btn.dataset.filter);
+    });
+  });
 }
 function renderToppings(){
   let list=TOPPINGS;
-  if(filter!=="Todos")list=list.filter(t=>t.group===filter);
-  document.getElementById("toppings").innerHTML=list.map(t=>{
+  if(filter!=="Todos") list=list.filter(t=>t.group===filter);
+
+  const box=document.getElementById("toppings");
+  box.innerHTML=list.map(t=>{
     const bad=current.scoops===1&&!t.oneAllowed;
+    const q=current.toppings[t.id]||0;
     return `<div class="product ${bad?'warn':''}">
-      <div><div class="pname">${t.name}</div><div class="meta">${bad?'Se cobra extra en 1 bola':'Puede incluir'} · Extra ${money(t.extraPrice)}</div></div>
-      <div class="qty"><button onclick="qty(current.toppings,'${t.id}',-1)">−</button><span class="num">${current.toppings[t.id]||0}</span><button onclick="qty(current.toppings,'${t.id}',1)">+</button></div>
+      <div>
+        <div class="pname">${t.name}</div>
+        <div class="meta">${bad?'Se cobra extra en 1 bola':'Puede incluir'} · Extra ${money(t.extraPrice)}</div>
+      </div>
+      <div class="qty">
+        <button type="button" data-top-minus="${t.id}">−</button>
+        <span class="num">${q}</span>
+        <button type="button" data-top-plus="${t.id}">+</button>
+      </div>
     </div>`;
   }).join("");
+
+  box.querySelectorAll("[data-top-minus]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      qty(current.toppings,btn.dataset.topMinus,-1);
+    });
+  });
+  box.querySelectorAll("[data-top-plus]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      qty(current.toppings,btn.dataset.topPlus,1);
+    });
+  });
 }
 function renderMochis(){
-  document.getElementById("mochis").innerHTML=MOCHIS.map(m=>`<div class="product">
-    <div><div class="pname">${m.name}</div><div class="meta">${money(m.price)}</div></div>
-    <div class="qty"><button onclick="qty(current.mochis,'${m.id}',-1)">−</button><span class="num">${current.mochis[m.id]||0}</span><button onclick="qty(current.mochis,'${m.id}',1)">+</button></div>
-  </div>`).join("");
+  const box=document.getElementById("mochis");
+  box.innerHTML=MOCHIS.map(m=>{
+    const q=current.mochis[m.id]||0;
+    return `<div class="product">
+      <div>
+        <div class="pname">${m.name}</div>
+        <div class="meta">${money(m.price)}</div>
+      </div>
+      <div class="qty">
+        <button type="button" data-mochi-minus="${m.id}">−</button>
+        <span class="num">${q}</span>
+        <button type="button" data-mochi-plus="${m.id}">+</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  box.querySelectorAll("[data-mochi-minus]").forEach(btn=>{
+    btn.addEventListener("click",()=>qty(current.mochis,btn.dataset.mochiMinus,-1));
+  });
+  box.querySelectorAll("[data-mochi-plus]").forEach(btn=>{
+    btn.addEventListener("click",()=>qty(current.mochis,btn.dataset.mochiPlus,1));
+  });
 }
 function calc(){
   const selected=[];
