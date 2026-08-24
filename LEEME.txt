@@ -1,14 +1,17 @@
-Cero Grados v80 - Pedidos + Caja
+Go hōbi POS v90
 
-1. Ejecuta supabase_schema.sql en Supabase.
-2. Sube index.html y .nojekyll al repositorio.
-3. Abre GitHub Pages con ?v=80.
-4. Tablet 1: Pedidos.
-5. Dispositivo 2: Caja.
-6. Caja se actualiza cada 3 segundos.
+Diseño aplicado con identidad Go hōbi:
+- Linen White #F6EDE9
+- Toast Brown #9B6C66
+- Burnt Brown #A7624C
+- Espresso #7B3B34
+- Tobacco #3B2B29
+- Blush Brown #C39A94
 
-La app usa:
-- Project URL de Supabase
-- sb_publishable_... (publishable key)
-- REST API directa
-No usa service_role ni secret keys.
+Mantiene:
+- Pantalla inicial Pedidos / Caja
+- Catálogo y lógica
+- Conexión Supabase de la versión anterior
+
+Abrir con:
+?v=90
