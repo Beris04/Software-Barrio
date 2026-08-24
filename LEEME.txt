@@ -1,14 +1,18 @@
-Go hōbi POS v91
+Go hōbi POS v92
 
-Correcciones funcionales:
-- Selección de sabores Bola 1.
-- Selección de sabores Bola 2.
-- Botones + / - de toppings.
-- Botones + / - de mochis.
-- Filtros de toppings.
-- Mejor soporte táctil para tablet.
+CORRECCIÓN:
+La v91 tenía los eventos de clic correctos, pero faltaba la función render().
+Por eso seleccionar sabores o pulsar + / - generaba un error y no actualizaba el pedido.
+
+v92 corrige:
+- Sabores Bola 1
+- Sabores Bola 2
+- + / - Toppings
+- + / - Mochis
+- Filtros
+- Resumen en tiempo real
 
 No se cambió el diseño aprobado.
 
 Abrir con:
-?v=91
+?v=92

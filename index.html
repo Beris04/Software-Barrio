@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Go hōbi POS v91</title>
+<title>Go hōbi POS v92</title>
 <style>
 :root{
  --bg:#f7f9fb;--card:#fff;--ink:#0f1720;--muted:#667085;--line:#e5e7eb;
@@ -147,7 +147,7 @@ textarea{resize:vertical}
 
 </style>
 
-<style id="gohobi-v91-theme">
+<style id="gohobi-v92-theme">
 :root{
  --linen:#F6EDE9;--toast:#9B6C66;--burnt:#A7624C;--espresso:#7B3B34;
  --tobacco:#3B2B29;--blush:#C39A94;--cream:#FFF9F6;--green:#4FA35D;
@@ -201,7 +201,7 @@ input:focus,textarea:focus{outline:2px solid rgba(155,108,102,.22)!important;bor
 </style>
 
 
-<style id="v91-click-fix">
+<style id="v92-click-fix">
 .flavor,.filter,.product,.qty button,.choiceCard,.sizeCard,.startChoice,.navBtn,
 button,[onclick]{
   pointer-events:auto!important;
@@ -582,6 +582,15 @@ function renderSummary(){
   document.getElementById("total").textContent=money(c.total);
   document.getElementById("customerChip").textContent=document.getElementById("customer").value.trim()||"Sin nombre";
 }
+
+function render(){
+  renderFlavors();
+  renderFilters();
+  renderToppings();
+  renderMochis();
+  renderSummary();
+}
+
 function clearOrder(){
   current={type:"helado",scoops:1,f1:FLAVORS[0].id,f2:FLAVORS[0].id,toppings:{},mochis:{}};
   document.getElementById("customer").value="";
@@ -672,10 +681,15 @@ async function markPaid(id){
   }
 }
 
+
+window.addEventListener("error",function(e){
+  console.error("Error en aplicación:",e.error||e.message);
+});
+
 document.getElementById("customer").addEventListener("input",renderSummary);
 setInterval(()=>{if(document.getElementById("screenCaja").classList.contains("active"))loadOrders()},3000);
 
-renderFlavors();renderFilters();renderToppings();renderMochis();renderSummary();loadOrders();
+render();loadOrders();
 </script>
 </body>
 </html>
