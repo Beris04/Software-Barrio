@@ -1,18 +1,24 @@
-Go hōbi POS v92
+Go hōbi POS v94 — cierre de configuración
 
-CORRECCIÓN:
-La v91 tenía los eventos de clic correctos, pero faltaba la función render().
-Por eso seleccionar sabores o pulsar + / - generaba un error y no actualizaba el pedido.
+Incluye:
+- Caja con lista + detalle del pedido.
+- Códigos de captura tomados del Excel COMANDAS SOFTWARE 25-MAY.
+- Helados:
+  Matcha 002896, Taro 002897, Sake 002898, Lychee 002899, Yuzu 002900.
+- Mochis: códigos individuales 002705–002711 según sabor.
+- Topping Clásico 002925.
+- Topping Especial 002926.
+- Topping Premium 002927.
+- Tapioca 002575.
+- Los códigos aparecen SOLO en detalle de Caja y ticket.
+- Botón Imprimir ticket en Pedidos.
+- Botón Imprimir ticket en Caja.
+- Ticket térmico preparado para papel de 80 mm (Epson TM-T88VII).
 
-v92 corrige:
-- Sabores Bola 1
-- Sabores Bola 2
-- + / - Toppings
-- + / - Mochis
-- Filtros
-- Resumen en tiempo real
+IMPORTANTE SOBRE EPSON:
+Desde GitHub Pages el navegador abre el cuadro de impresión. En la computadora de Caja,
+instala la Epson TM-T88VII, configura papel de 80 mm y déjala como impresora predeterminada.
+La aplicación no guarda una clave de administrador de impresora ni requiere contraseña.
 
-No se cambió el diseño aprobado.
-
-Abrir con:
-?v=92
+Abrir:
+?v=94

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Go hōbi POS v92</title>
+<title>Go hōbi POS v94</title>
 <style>
 :root{
  --bg:#f7f9fb;--card:#fff;--ink:#0f1720;--muted:#667085;--line:#e5e7eb;
@@ -147,7 +147,7 @@ textarea{resize:vertical}
 
 </style>
 
-<style id="gohobi-v92-theme">
+<style id="gohobi-v94-theme">
 :root{
  --linen:#F6EDE9;--toast:#9B6C66;--burnt:#A7624C;--espresso:#7B3B34;
  --tobacco:#3B2B29;--blush:#C39A94;--cream:#FFF9F6;--green:#4FA35D;
@@ -201,7 +201,7 @@ input:focus,textarea:focus{outline:2px solid rgba(155,108,102,.22)!important;bor
 </style>
 
 
-<style id="v92-click-fix">
+<style id="v94-click-fix">
 .flavor,.filter,.product,.qty button,.choiceCard,.sizeCard,.startChoice,.navBtn,
 button,[onclick]{
   pointer-events:auto!important;
@@ -232,8 +232,52 @@ button,[onclick]{
 }
 </style>
 
+
+<style id="v94-final">
+.cashMasterDetail{display:grid;grid-template-columns:minmax(300px,.85fr) minmax(430px,1.15fr);gap:16px;align-items:start}
+.cashListPanel,.cashDetailPanel{background:#fffaf7;border:1px solid #E8D8D3;border-radius:20px;box-shadow:0 10px 28px rgba(59,43,41,.07)}
+.cashListPanel{padding:16px}.cashOneCol{grid-template-columns:1fr!important}
+.cashDetailPanel{overflow:hidden;position:sticky;top:16px}
+.cashDetailHeader{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #E8D8D3}
+.cashDetailLabel{font-size:12px;color:#9B6C66;font-weight:900;letter-spacing:.6px}
+.cashDetailId{font-size:28px;font-weight:950;color:#7B3B34}
+.cashDetailBody{padding:8px 20px 18px}
+.cashCard{cursor:pointer!important}.cashCard.selected{border-color:#9B6C66!important;background:#F9ECE8!important;box-shadow:0 0 0 2px rgba(155,108,102,.12)!important}
+.cashActions{display:none!important}
+.detailSection{padding:14px 0;border-bottom:1px solid #E8D8D3}
+.detailTitle{display:flex;justify-content:space-between;gap:12px;font-weight:950;margin-bottom:8px}
+.detailTitle.ice{color:#356f9f}.detailTitle.mochi{color:#b9607c}.detailTitle.top{color:#4b9859}.detailTitle.extra{color:#d76b35}
+.detailRow{display:grid;grid-template-columns:88px 1fr auto;gap:10px;align-items:center;padding:6px 0;font-size:14px}
+.codeBadge{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:900;background:#F3E7E3;color:#7B3B34;border-radius:8px;padding:5px 7px;text-align:center}
+.detailTotal{display:flex;justify-content:space-between;font-size:27px;font-weight:950;padding:18px 0 12px}
+.cashDetailButtons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.printBtn{border:0;border-radius:13px;padding:14px;background:#3B2B29;color:#fff;font-weight:950;cursor:pointer}
+.payBtn{border:0;border-radius:13px;padding:14px;background:linear-gradient(135deg,#A7624C,#7B3B34);color:#fff;font-weight:950;cursor:pointer}
+.orderPrintBtn{width:100%;margin-top:10px;border:1px solid #9B6C66;border-radius:13px;padding:13px;background:#fffaf7;color:#7B3B34;font-weight:950;cursor:pointer}
+@media(max-width:980px){.cashMasterDetail{grid-template-columns:1fr}.cashDetailPanel{position:relative;top:auto}}
+/* 80 mm Epson receipt */
+#printArea{display:none}
+@media print{
+ @page{size:80mm auto;margin:3mm}
+ body *{visibility:hidden!important}
+ #printArea,#printArea *{visibility:visible!important}
+ #printArea{display:block!important;position:absolute;left:0;top:0;width:74mm;background:white;color:#000;font-family:Arial,sans-serif}
+ .receipt{text-align:left;font-size:11px;line-height:1.28}
+ .receipt .rlogo{text-align:center;font-size:22px;font-weight:900;margin-bottom:2px}
+ .receipt .rsub{text-align:center;font-size:9px;letter-spacing:1px}
+ .receipt .dash{border-top:1px dashed #000;margin:7px 0}
+ .receipt .rtitle{text-align:center;font-weight:900;font-size:14px}
+ .receipt .rhead{display:flex;justify-content:space-between;font-weight:900;font-size:14px}
+ .receipt .row{display:flex;justify-content:space-between;gap:5px;margin:3px 0}
+ .receipt .code{font-family:monospace;font-weight:900;white-space:nowrap}
+ .receipt .section{font-weight:900;margin-top:5px}
+ .receipt .total{display:flex;justify-content:space-between;font-size:17px;font-weight:900;margin-top:5px}
+ .receipt .thanks{text-align:center;margin-top:8px}
+}
+</style>
+
 </head>
-<body>
+<body><div id="printArea"></div>
 
 <div id="startScreen" class="startScreen">
  <div class="startBox">
@@ -339,19 +383,38 @@ button,[onclick]{
             <div id="summary"></div>
             <div class="summaryTotal"><span>TOTAL</span><span id="total">$0.00</span></div>
             <button class="sendBtn" id="sendBtn" onclick="sendOrder()">ENVIAR A CAJA ↗</button>
-            <button class="clearBtn" onclick="clearOrder()">Limpiar pedido</button>
+            <button class="orderPrintBtn" onclick="printCurrentOrder()">Imprimir ticket</button>
+<button class="clearBtn" onclick="clearOrder()">Limpiar pedido</button>
           </div>
         </aside>
       </div>
     </section>
 
-    <section id="screenCaja" class="screen">
-      <div class="cashHeader">
-        <div><h1>Caja</h1><div style="color:var(--muted)">Pedidos enviados desde la tablet</div></div>
-        <button class="btn blue" onclick="loadOrders()">Actualizar</button>
+    
+<section id="screenCaja" class="screen">
+  <div class="cashHeader">
+    <div>
+      <h1>Caja</h1>
+      <div style="color:#806963">Selecciona un pedido para ver el detalle y los códigos de captura.</div>
+    </div>
+    <button class="btn blue" onclick="loadOrders()">Actualizar</button>
+  </div>
+  <div class="cashMasterDetail">
+    <div class="cashListPanel">
+      <h2>Pedidos</h2>
+      <div id="cashOrders" class="cashGrid cashOneCol"></div>
+    </div>
+    <aside class="cashDetailPanel">
+      <div class="cashDetailHeader">
+        <div><div class="cashDetailLabel">DETALLE DEL PEDIDO</div><div id="cashDetailCustomer"></div></div>
+        <div id="cashDetailId" class="cashDetailId">—</div>
       </div>
-      <div id="cashOrders" class="cashGrid"></div>
-    </section>
+      <div id="cashDetailBody" class="cashDetailBody">
+        <div class="empty">Selecciona un pedido.</div>
+      </div>
+    </aside>
+  </div>
+</section>
   </main>
 </div>
 
@@ -366,11 +429,29 @@ const HEADERS={
   "Content-Type":"application/json"
 };
 
-const FLAVORS=[{"id": "matcha", "name": "Matcha"}, {"id": "taro", "name": "Taro"}, {"id": "sake", "name": "Sake"}, {"id": "lychee", "name": "Lychee"}, {"id": "yuzu", "name": "Yuzu"}];
-const MOCHIS=[{"id": "m1", "name": "Mochi Café Con Leche", "price": 55}, {"id": "m2", "name": "Mochi Caramel Macchiato", "price": 55}, {"id": "m3", "name": "Mochi Doble Mango", "price": 55}, {"id": "m4", "name": "Mochi Flan De Caramelo", "price": 55}, {"id": "m5", "name": "Mochi Matcha Ujikintoki", "price": 55}, {"id": "m6", "name": "Mochi Pastel De Fresa", "price": 55}, {"id": "m7", "name": "Mochi Yogurt Arándano", "price": 55}];
+const FLAVORS=[{"id":"matcha","name":"Matcha","barcode":"002896"},{"id":"taro","name":"Taro","barcode":"002897"},{"id":"sake","name":"Sake","barcode":"002898"},{"id":"lychee","name":"Lychee","barcode":"002899"},{"id":"yuzu","name":"Yuzu","barcode":"002900"}];
+const MOCHIS=[{"id":"m1","name":"Mochi Café Con Leche","price":55,"barcode":"002708"},{"id":"m2","name":"Mochi Caramel Macchiato","price":55,"barcode":"002705"},{"id":"m3","name":"Mochi Doble Mango","price":55,"barcode":"002710"},{"id":"m4","name":"Mochi Flan De Caramelo","price":55,"barcode":"002711"},{"id":"m5","name":"Mochi Matcha Ujikintoki","price":55,"barcode":"002709"},{"id":"m6","name":"Mochi Pastel De Fresa","price":55,"barcode":"002707"},{"id":"m7","name":"Mochi Yogurt Arándano","price":55,"barcode":"002706"}];
 const TOPPINGS=[{"id": "tapioca", "name": "Tapioca", "group": "Tapioca", "extraPrice": 15, "oneAllowed": true}, {"id": "t1", "name": "Lemon", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t2", "name": "Manzana Verde", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t3", "name": "Lychee", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t4", "name": "Kiwi", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t5", "name": "Maracuyá", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t6", "name": "Uva", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t7", "name": "Plátano", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t8", "name": "Mango", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t9", "name": "Durazno", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t10", "name": "Naranja", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t11", "name": "Yogurt Jelly", "group": "Gomitas", "extraPrice": 7, "oneAllowed": true}, {"id": "t12", "name": "Pocky Almond Crush", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t13", "name": "Pocky Koi Fukami Matcha", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t14", "name": "Pocky Chocolate Japón", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t15", "name": "Pocky Fresa", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t16", "name": "Pocky Cookies & Cream", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t17", "name": "Pocky Chocolate Banana", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t18", "name": "Elise Leche De Hokkaido", "group": "Galletas", "extraPrice": 7, "oneAllowed": false}, {"id": "t19", "name": "Kancho Chocolate", "group": "Galletas", "extraPrice": 7, "oneAllowed": false}, {"id": "t20", "name": "Pocky Tsubu Tsubu Ichigo", "group": "Pocky", "extraPrice": 7, "oneAllowed": true}, {"id": "t21", "name": "Langrace", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t22", "name": "Choco Pie Cacao", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t23", "name": "French Pie Fresa", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t24", "name": "Sandwich Starawberry", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t25", "name": "Every Burger 66 G", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t26", "name": "Butter Ring Chocolate 103G", "group": "Galletas", "extraPrice": 12, "oneAllowed": false}, {"id": "t27", "name": "Kitkat Otona No Amasa Koi Matcha", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t28", "name": "Kitkat Otona No Amasa", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t29", "name": "Kitkat Mini", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t30", "name": "Kitkat Doble Frutos Rojos & Nueces", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t31", "name": "Kitkat Fresa Y Chocolate", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t32", "name": "Kitkat Chocolate Naranja", "group": "KitKat", "extraPrice": 15, "oneAllowed": true}, {"id": "t33", "name": "Kukkia Chocolate Con Leche", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t34", "name": "Kukkia Dark Chocolate", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t35", "name": "Kukkia Green Tea", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t36", "name": "Kukkia Fresa", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t37", "name": "Orion Fish Cake", "group": "Orion", "extraPrice": 15, "oneAllowed": false}, {"id": "t38", "name": "Vainilla Almond", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t39", "name": "Red Hat", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t40", "name": "Caramel Choco Sandwich", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t41", "name": "Choco Crunch", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t42", "name": "Nuts Berry Heart", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t43", "name": "White Choco Almond", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t44", "name": "Strawberry Cookie", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t45", "name": "Choco Cookie", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t46", "name": "Langue De Chat Roll", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t47", "name": "Florentins Cookie", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}, {"id": "t48", "name": "Orion Bichobi Chocolate", "group": "Orion", "extraPrice": 15, "oneAllowed": false}, {"id": "t49", "name": "White Choco Ball", "group": "Galletas", "extraPrice": 15, "oneAllowed": false}];
 
+function toppingBarcode(t){
+  if(t.id==="tapioca") return "002575";
+  if(Number(t.extraPrice)===7) return "002925";   // Clásico
+  if(Number(t.extraPrice)===12) return "002926";  // Especial
+  return "002927";                                // Premium
+}
+function toppingCategory(t){
+  if(t.id==="tapioca") return "Tapioca";
+  if(Number(t.extraPrice)===7) return "Clásico";
+  if(Number(t.extraPrice)===12) return "Especial";
+  return "Premium";
+}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+
 let orders=[];
+let selectedCashOrderId=null;
 let filter="Todos";
 let current={type:"helado",scoops:1,f1:FLAVORS[0].id,f2:FLAVORS[0].id,toppings:{},mochis:{}};
 
@@ -611,7 +692,7 @@ async function sendOrder(){
     type:current.type,
     product_type:current.type,
     scoops:current.type==="helado"?current.scoops:0,
-    flavor:{name:current.type==="helado"?(current.scoops===1?c.f1.name:c.f1.name+" + "+c.f2.name):"Solo Mochis"},
+    flavor:current.type==="helado"?{name:(current.scoops===1?c.f1.name:c.f1.name+" + "+c.f2.name),f1:c.f1,f2:current.scoops===2?c.f2:null} : {name:"Solo Mochis"},
     base:c.base,
     included:c.included,
     extras:c.extras,
@@ -648,22 +729,110 @@ async function loadOrders(){
   }
   renderCash();
 }
+
+function orderFlavorRows(o){
+  if(!o || Number(o.scoops||0)<=0) return [];
+  if(o.flavor?.f1) {
+    const rows=[o.flavor.f1];
+    if(Number(o.scoops)===2 && o.flavor?.f2) rows.push(o.flavor.f2);
+    return rows;
+  }
+  // Compatibilidad con pedidos anteriores.
+  const names=String(o.flavor?.name||"").split("+").map(x=>x.trim()).filter(Boolean);
+  return names.map(n=>FLAVORS.find(f=>f.name.toLowerCase()===n.toLowerCase())||{name:n,barcode:"—"});
+}
 function renderCash(){
   const list=orders.filter(o=>o.status==="pendiente_pago"||o.status==="pagado");
-  document.getElementById("cashOrders").innerHTML=list.length?list.map(o=>`
-    <div class="cashCard ${o.status==="pagado"?'paid':''}">
+  if(!list.length){
+    document.getElementById("cashOrders").innerHTML='<div class="empty">No hay pedidos</div>';
+    selectedCashOrderId=null; renderCashDetail(); return;
+  }
+  if(!selectedCashOrderId || !list.some(o=>String(o.id)===String(selectedCashOrderId))){
+    selectedCashOrderId=(list.find(o=>o.status==="pendiente_pago")||list[0]).id;
+  }
+  document.getElementById("cashOrders").innerHTML=list.map(o=>`
+    <div class="cashCard ${o.status==="pagado"?'paid':''} ${String(o.id)===String(selectedCashOrderId)?'selected':''}" data-cash-id="${esc(o.id)}">
       <div class="cashTop">
-        <div><div class="cashName">${o.customer}</div><span class="pill">${o.status==="pagado"?'PAGADO':'PENDIENTE'}</span></div>
+        <div><div class="cashName">#${esc(o.id)} · ${esc(o.customer)}</div><span class="pill">${o.status==="pagado"?'PAGADO':'PENDIENTE'}</span></div>
         <div class="cashTotal">${money(o.total)}</div>
       </div>
-      ${o.scoops>0?`<div class="cashLine"><span>${o.scoops} bola(s) · ${o.flavor?.name||""}</span><b>${money(o.base)}</b></div>`:""}
-      ${(o.mochis||[]).map(m=>`<div class="cashLine"><span>${m.qty} x ${m.name}</span><b>${money(m.subtotal)}</b></div>`).join("")}
-      ${(o.included||[]).map(t=>`<div class="cashLine"><span>${t.name}</span><b>Incluido</b></div>`).join("")}
-      ${(o.extras||[]).map(t=>`<div class="cashLine"><span>Extra: ${t.name}</span><b>${money(t.extraPrice)}</b></div>`).join("")}
-      ${o.notes?`<div style="margin-top:8px;color:#667085"><b>Obs:</b> ${o.notes}</div>`:""}
-      ${o.status!=="pagado"?`<div class="cashActions"><button class="btn green" onclick="markPaid('${o.id}')">Marcar pagado</button></div>`:""}
+      ${o.scoops>0?`<div class="cashLine"><span>${o.scoops} bola(s) · ${esc(o.flavor?.name||"")}</span><b>${money(o.base)}</b></div>`:""}
+      ${(o.mochis||[]).map(m=>`<div class="cashLine"><span>${m.qty} × ${esc(m.name)}</span><b>${money(m.subtotal)}</b></div>`).join("")}
+      <div class="cashLine"><span>${(o.included||[]).length} toppings · ${(o.extras||[]).length} extras</span><b></b></div>
     </div>
-  `).join(""):'<div class="empty">No hay pedidos pendientes</div>';
+  `).join("");
+  document.querySelectorAll("[data-cash-id]").forEach(card=>card.addEventListener("click",()=>{
+    selectedCashOrderId=card.dataset.cashId; renderCash(); renderCashDetail();
+  }));
+  renderCashDetail();
+}
+function renderCashDetail(){
+  const o=orders.find(x=>String(x.id)===String(selectedCashOrderId));
+  document.getElementById("cashDetailId").textContent=o?"#"+o.id:"—";
+  document.getElementById("cashDetailCustomer").textContent=o?(o.customer||""):"";
+  const box=document.getElementById("cashDetailBody");
+  if(!o){box.innerHTML='<div class="empty">Selecciona un pedido.</div>';return}
+  const flavors=orderFlavorRows(o);
+  box.innerHTML=`
+    ${Number(o.scoops||0)>0?`<div class="detailSection">
+      <div class="detailTitle ice"><span>● HELADO · ${o.scoops} bola(s)</span><span>${money(o.base)}</span></div>
+      ${flavors.map((f,i)=>`<div class="detailRow"><span class="codeBadge">${esc(f.barcode||"—")}</span><span>Bola ${i+1}: ${esc(f.name)}</span><span></span></div>`).join("")}
+    </div>`:""}
+    ${(o.mochis||[]).length?`<div class="detailSection">
+      <div class="detailTitle mochi"><span>● MOCHIS</span><span></span></div>
+      ${(o.mochis||[]).map(m=>{const ref=MOCHIS.find(x=>x.id===m.id)||m;return `<div class="detailRow"><span class="codeBadge">${esc(ref.barcode||"—")}</span><span>${esc(m.name)} ×${m.qty}</span><span>${money(m.subtotal)}</span></div>`}).join("")}
+    </div>`:""}
+    ${(o.included||[]).length?`<div class="detailSection">
+      <div class="detailTitle top"><span>● TOPPINGS INCLUIDOS (${o.included.length})</span><span>$0</span></div>
+      ${(o.included||[]).map(t=>`<div class="detailRow"><span class="codeBadge">${toppingBarcode(t)}</span><span>${esc(t.name)} <small>(${toppingCategory(t)})</small></span><span>Incluido</span></div>`).join("")}
+    </div>`:""}
+    ${(o.extras||[]).length?`<div class="detailSection">
+      <div class="detailTitle extra"><span>● EXTRAS (${o.extras.length})</span><span>${money((o.extras||[]).reduce((s,t)=>s+Number(t.extraPrice||0),0))}</span></div>
+      ${(o.extras||[]).map(t=>`<div class="detailRow"><span class="codeBadge">${toppingBarcode(t)}</span><span>${esc(t.name)} <small>(${toppingCategory(t)})</small></span><span>${money(t.extraPrice)}</span></div>`).join("")}
+    </div>`:""}
+    ${o.notes?`<div class="detailSection"><b>Observaciones:</b> ${esc(o.notes)}</div>`:""}
+    <div class="detailTotal"><span>TOTAL</span><span>${money(o.total)}</span></div>
+    <div class="cashDetailButtons">
+      <button class="printBtn" onclick="printCashOrder('${esc(o.id)}')">Imprimir ticket</button>
+      ${o.status!=="pagado"?`<button class="payBtn" onclick="markPaid('${esc(o.id)}')">Marcar pagado</button>`:`<button class="payBtn" disabled style="opacity:.55">Pagado</button>`}
+    </div>`;
+}
+function receiptHTML(o){
+  const flavors=orderFlavorRows(o);
+  const date=o.created_at?new Date(o.created_at):new Date();
+  const d=date.toLocaleDateString("es-MX"), tm=date.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
+  return `<div class="receipt">
+    <div class="rlogo">Go hōbi</div><div class="rsub">HELADOS & POSTRES</div>
+    <div class="dash"></div><div class="rtitle">TICKET DE PEDIDO</div>
+    <div class="rhead"><span>#${esc(o.id||"NUEVO")}</span><span>${esc(o.customer||"")}</span></div>
+    <div class="row"><span>${d}</span><span>${tm}</span></div><div class="dash"></div>
+    ${Number(o.scoops||0)>0?`<div class="section">HELADO · ${o.scoops} BOLA(S)</div>${flavors.map((f,i)=>`<div class="row"><span>Bola ${i+1}: ${esc(f.name)}</span><span class="code">${esc(f.barcode||"—")}</span></div>`).join("")}`:""}
+    ${(o.mochis||[]).length?`<div class="dash"></div><div class="section">MOCHIS</div>${o.mochis.map(m=>{const ref=MOCHIS.find(x=>x.id===m.id)||m;return `<div class="row"><span>${esc(m.name)} ×${m.qty}</span><span class="code">${esc(ref.barcode||"—")}</span></div>`}).join("")}`:""}
+    ${(o.included||[]).length?`<div class="dash"></div><div class="section">TOPPINGS INCLUIDOS</div>${o.included.map(t=>`<div class="row"><span>${esc(t.name)}</span><span class="code">${toppingBarcode(t)}</span></div>`).join("")}`:""}
+    ${(o.extras||[]).length?`<div class="dash"></div><div class="section">EXTRAS</div>${o.extras.map(t=>`<div class="row"><span>${esc(t.name)} ${money(t.extraPrice)}</span><span class="code">${toppingBarcode(t)}</span></div>`).join("")}`:""}
+    ${o.notes?`<div class="dash"></div><div><b>Obs:</b> ${esc(o.notes)}</div>`:""}
+    <div class="dash"></div><div class="total"><span>TOTAL</span><span>${money(o.total)}</span></div>
+    <div class="thanks">¡Gracias por tu preferencia!</div>
+  </div>`;
+}
+function printCashOrder(id){
+  const o=orders.find(x=>String(x.id)===String(id)); if(!o)return;
+  document.getElementById("printArea").innerHTML=receiptHTML(o);
+  window.print();
+}
+function printCurrentOrder(){
+  const name=document.getElementById("customer").value.trim()||"Pedido";
+  const c=calc();
+  if(c.total<=0)return alert("Agrega un producto");
+  const temp={
+    id:"NUEVO",customer:name,created_at:new Date().toISOString(),
+    scoops:current.type==="helado"?current.scoops:0,
+    flavor:current.type==="helado"?{name:(current.scoops===1?c.f1.name:c.f1.name+" + "+c.f2.name),f1:c.f1,f2:current.scoops===2?c.f2:null}:{name:"Solo Mochis"},
+    base:c.base,included:c.included,extras:c.extras,mochis:c.mochiItems,total:c.total,
+    notes:document.getElementById("notes").value
+  };
+  document.getElementById("printArea").innerHTML=receiptHTML(temp);
+  window.print();
 }
 async function markPaid(id){
   const o=orders.find(x=>String(x.id)===String(id));
